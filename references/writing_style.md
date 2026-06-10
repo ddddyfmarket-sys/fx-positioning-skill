@@ -113,9 +113,16 @@ Keep the whole thing to roughly one page. Density over length.
   - Mirror case (stretched despite the sign): *"CHF is net short (−34% OI) yet
     sits at the top of its range (98th %ile) — a heavily-covered short,
     stretched toward the long end despite the negative net."*
-- **±2SD bands (history chart).** Where a currency sits vs its own ±2SD
-  envelope is the cleanest "extreme or not" read. Use it to say whether the
-  current print is genuinely at an extreme or merely elevated.
+- **±2SD bands = full history (use `Hist Z`, not the 52W stat).** The history
+  chart's ±2SD envelope is computed over the **full** series (2006→), so the
+  correct "genuine extreme vs merely elevated" read is the `Hist Z` / `Hist
+  Pctl` columns — *not* the 52W/13W percentile, and not an eyeball of the small
+  subplots. The two windows can diverge hard: a book can sit at the top of its
+  trailing year (52W 98th %ile) yet be below its long-run mean (Hist Z −0.9,
+  19th %ile) — the recent picture is "shorts covered to a 1-yr high," the
+  full-history picture is "still net short, mid-low range." Say which window you
+  mean, and only call a ±2SD / multi-year extreme when `Hist Z` supports it
+  (|Hist Z| ≳ 2). Never attribute a 52W extreme to the history chart.
 
 ## Punch, and no repetition
 

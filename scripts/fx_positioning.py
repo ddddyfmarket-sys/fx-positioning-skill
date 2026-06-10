@@ -250,8 +250,12 @@ def compute_row(ccy: str, ccy_data: dict) -> dict | None:
     # Lookback windows of the Total Net % OI series (most recent N reports).
     # 52W ≈ 1Y; 13W ≈ 3M. The 13-week window is enough observations for the
     # percentile/Z to be reasonably meaningful (a 4-week window was too thin).
-    hist_52w = [r["total_net_pct"] for r in history[-52:]]
-    hist_13w = [r["total_net_pct"] for r in history[-13:]]
+    hist_52w  = [r["total_net_pct"] for r in history[-52:]]
+    hist_13w  = [r["total_net_pct"] for r in history[-13:]]
+    hist_full = [r["total_net_pct"] for r in history]   # full history (2006→); this
+    #                                                     is the baseline the ±2SD
+    #                                                     bands on the history chart
+    #                                                     use — NOT the 52W window.
 
     cur   = latest["total_net_pct"]
     wow   = cur - prev["total_net_pct"]                 # vs last week (history[-2])
@@ -265,6 +269,13 @@ def compute_row(ccy: str, ccy_data: dict) -> dict | None:
         "52W Z":      round(z_score(cur, hist_52w), 2),
         "13W Pctl":   round(pctl_rank(cur, hist_13w), 1),
         "13W Z":      round(z_score(cur, hist_13w), 2),
+        # Full-history reads — the correct basis for any "±2SD band / historic
+        # extreme" statement (the history chart's bands are full-history). These
+        # can diverge sharply from the 52W reads: a position can sit at the top
+        # of its trailing year (52W Pctl ~98) yet be mid- or low-range on full
+        # history (Hist Pctl ~20) — e.g. a heavily-covered but still-net-short book.
+        "Hist Z":     round(z_score(cur, hist_full), 2),
+        "Hist Pctl":  round(pctl_rank(cur, hist_full), 1),
         "WoW Chg":    round(wow, 2),
         "MoM Chg":    mom,
         "Total Net":  round(cur, 2),
@@ -669,14 +680,18 @@ def write_table_csv(fx_rows: list[dict], cot_date, outdir: Path) -> None:
     AM-vs-lev divergence is a core part of the positioning read."""
     import csv
 
-    cols = ["CCY", "52W Pctl", "52W Z", "13W Pctl", "13W Z", "WoW Chg",
-            "MoM Chg", "Total Net", "LevFd Net", "AstMgr Net", "Open Int", "Date"]
+    cols = ["CCY", "52W Pctl", "52W Z", "13W Pctl", "13W Z", "Hist Z", "Hist Pctl",
+            "WoW Chg", "MoM Chg", "Total Net", "LevFd Net", "AstMgr Net",
+            "Open Int", "Date"]
     path = outdir / "positioning_table.csv"
     with path.open("w", newline="") as f:
         w = csv.writer(f)
         w.writerow([f"# FX Positioning Monitor — COT as of {cot_date}. "
                     f"Net = (Leveraged Funds + Asset Managers) long − short as % of "
-                    f"Open Interest. Pctl/Z are vs trailing 52W and 13W windows."])
+                    f"Open Interest. 52W/13W Pctl & Z are vs trailing 52- and 13-week "
+                    f"windows (recent crowding). Hist Z / Hist Pctl are vs FULL history "
+                    f"(2006→) — this is the basis for the history chart's ±2SD bands and "
+                    f"for any 'historic extreme' read. The two windows can diverge sharply."])
         w.writerow(cols)
         for r in fx_rows:
             w.writerow([r.get(c, "") for c in cols])

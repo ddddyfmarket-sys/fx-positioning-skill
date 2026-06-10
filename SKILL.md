@@ -70,16 +70,19 @@ Read all three analytical outputs before writing a word:
 2. `ytd_positioning.png` — for the YTD picture: where each currency sits in
    its own year's range, and whether it moved toward or away from an extreme
    in the last week (× vs •).
-3. `history_positioning.png` — for the long-run read: is the current print at
-   a genuine ±2SD extreme, or merely elevated within a normal range?
+3. `history_positioning.png` — for the long-run *shape*: the trajectory, regime
+   shifts, how the current move compares to past swings. For the precise "is it
+   at a ±2SD extreme" question, **trust `Hist Z` in the table, not your eye** —
+   the subplots are small and the bands are full-history (|Hist Z| ≳ 2 ≈ at the
+   band). Use the chart for context; use the number for the claim.
 
 If the script reports a currency skipped for insufficient history, say so
 rather than inventing a read.
 
 If your runtime can't view images, work from `positioning_table.csv` alone —
-its 52W/13W percentile and z-score columns capture most of what the charts
-show — and note in the output that the chart-based reads were inferred from the
-table rather than the figures.
+its 52W/13W and full-history (Hist Z / Hist Pctl) columns capture the
+positioning state — and note in the output that the chart-based reads were
+inferred from the table rather than the figures.
 
 ### 3. Reading the metrics
 
@@ -95,6 +98,17 @@ The table columns, and what each tells you:
   the 52W mean.
 - **13W Pctl / 13W Z** — the same, vs the last ~3 months (the tactical read).
   When 13W and 52W diverge, a regime shift is underway — name it.
+- **Hist Z / Hist Pctl** — the position vs its **full history** (2006→). This,
+  *not* the 52W/13W stat, is what the history chart's ±2SD bands reflect, and
+  the only correct basis for any "historic extreme / pressing its ±2SD band /
+  multi-year high-low" claim. **Use the right window:** 52W/13W = *recent*
+  crowding; Hist = *historic* extreme. They can diverge sharply — never map one
+  onto the other, and never eyeball an extreme off the small chart subplots when
+  the number is right here in the table. (Worked example: CHF reads 98th %ile /
+  +1.8z on 52W — top of the *past year*, shorts covered — but only 19th %ile /
+  −0.9 Hist Z, i.e. *below* its long-run mean and still net short. So it is
+  **not** near its upper ±2SD band; the history chart shows it in the lower,
+  net-short region. Claiming it "presses the upper band" would be wrong.)
 - **WoW Chg / MoM Chg** — change in Total Net % OI vs last week / ~4 weeks ago.
   The *flow*. Describe the biggest movers and the direction of flow.
 
