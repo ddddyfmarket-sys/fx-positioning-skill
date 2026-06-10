@@ -1,4 +1,4 @@
-# claude-fx-positioning
+# fx-positioning-skill
 
 An **[Agent Skill](https://www.anthropic.com/news/skills)** — works in
 [Claude Code](https://claude.com/claude-code), Cursor, OpenAI Codex, and other
@@ -55,15 +55,15 @@ Clone it into your tool's skills directory. **Keep the folder named
 
 ```bash
 # Claude Code
-git clone https://github.com/ddddyfmarket-sys/claude-fx-positioning.git \
+git clone https://github.com/ddddyfmarket-sys/fx-positioning-skill.git \
   ~/.claude/skills/fx-positioning
 
 # Cursor
-git clone https://github.com/ddddyfmarket-sys/claude-fx-positioning.git \
+git clone https://github.com/ddddyfmarket-sys/fx-positioning-skill.git \
   ~/.cursor/skills-cursor/fx-positioning
 
 # OpenAI Codex  (CODEX_HOME defaults to ~/.codex)
-git clone https://github.com/ddddyfmarket-sys/claude-fx-positioning.git \
+git clone https://github.com/ddddyfmarket-sys/fx-positioning-skill.git \
   "${CODEX_HOME:-$HOME/.codex}/skills/fx-positioning"
 
 # Any other agent: clone into wherever your host loads skills from.
