@@ -1,34 +1,49 @@
 # FX Positioning Monitor — 2 Jun 2026
 *CFTC TFF Futures+Options Combined · Net = Leveraged Funds + Asset Managers, % of open interest*
 
+**USD net long vs the past year but neutral vs history; CHF and NZD shorts heavily covered to the top of their ranges while JPY and CAD shorts deepen.**
+
 **Key Takeaways**
-- Aggregate USD length is elevated, not extreme: DXY net +8.8% OI, 81st %ile / +1.1z on the year, but pared over the month (MoM −5.6). Cohorts split — asset managers long the dollar (+34.6% OI), leveraged funds short the index (−25.8%).
-- CHF sits at the top of its range (98th %ile / +1.8z 52W, maxed 13W at +2.5z), added to again this week (WoW +2.8). Net still short (−34% OI): shorts heavily covered, not flipped.
-- JPY stays near the floor (4th %ile / −1.7z, net −30% OI) and extended shorter on the month (MoM −11.5). Both cohorts short.
-- NZD had the biggest weekly build in G10 (WoW +12.8, MoM +33.6% OI), maxing its 13W read — but it's short-covering off a −39% OI base, not fresh length.
-- AUD length is all leveraged funds (+17.6 vs AM +0.5% OI) and being pared hard (13W 8th %ile / −2.2z, WoW −6.1) while the 52W stays high.
-- EM is net long across the board: BRL +54.9, ZAR +45.4, MXN +39.8% OI. BRL is almost entirely asset managers. Recent flow is a trim (ZAR WoW −7.8).
+- USD net long +8.8% OI reads 81st %ile / +1.1z on the year but dead-neutral vs history (50th %ile, +0.0 Hist Z) — and it's an asset-manager long (+34.6) against a leveraged-funds short (−25.8).
+- CHF is net short −34.3% OI yet pinned at the top of its range — 98th %ile 52W, 100th %ile / +2.5z 13W — a heavily-covered short, added to again (+2.8 WoW, +6.5 MoM). Hist Z −0.9 keeps it below its long-run mean.
+- NZD holds the book's biggest net short (−39.5% OI) but saw the week's largest cover anywhere — +12.8 WoW, +33.6 MoM — vaulting 13W to the 100th %ile (+2.2z).
+- JPY is the most crowded G10 short, floor of its year at the 3.8th %ile / −1.7z, built −11.5 MoM. CAD short deepened hardest: −8.4 WoW, −22.8 MoM, 13W down to the 15th %ile.
+- BRL carries the largest net long (+54.9% OI) — almost all asset-manager (+51.9, lev +3.0) — but only mid-range (50th %ile): big without being stretched.
+- No position sits at a genuine historic extreme — the whole book is inside ±1.1 Hist Z.
 
 ## Aggregate / USD
-The dollar book is selective, not one-sided. DXY net is modestly long (+8.8% OI) and high on the year (81st %ile, +1.1z), but the tactical read is middling (13W 31st %ile) and the month pared length (MoM −5.6). The cohorts sit on opposite sides: asset managers long USD (+34.6% OI), leveraged funds short the index (−25.8%).
-
-Across the crosses the market is long EUR (+29.8) and AUD (+18.0) vs USD, short JPY (−30.0), CHF (−34.3), CAD (−29.7) and NZD (−39.5). The EUR long sits near the *bottom* of its 12-month range (13th %ile, −1.5z) despite the positive net — length trimmed hard, and what's left is asset managers (+32.1) against marginally short leveraged funds (−2.3).
+USD positioning is long but shallow. DXY net +8.8% OI reads 81st %ile / +1.1z against the trailing year, but flat against full history (50.5th %ile, +0.03 Hist Z) — elevated cyclically, neutral structurally. The month pared it (−5.6 MoM) and the tactical window has cooled to the 31st %ile (−0.2z 13W). The headline masks a clean cohort split: **asset managers are net long USD (+34.6) while leveraged funds are net short (−25.8)** — real money and fast money on opposite sides of the dollar. With the aggregate this close to its long-run mean, the read is dispersion, not a one-sided dollar. On `history_positioning.png` DXY sits inside its ±2SD envelope.
 
 ## G10 divergences
-- **CHF** — the cleanest *recent* range extreme: top of both trailing windows (98th %ile 52W, maxed 13W at +2.5z), still being added to (WoW +2.8, MoM +6.5). But that's a one-year story — on full history it's only the 19th %ile (−0.9 Hist Z), below its long-run mean and still net short (−34% OI). So: a heavily-covered short pushed to the top of its recent range, not a historic long extreme — well inside its ±2SD bands.
-- **JPY** — near the floor (4th %ile, −1.7z), net −30% OI, short extended over the month (MoM −11.5). A persistent, one-sided short.
-- **NZD** — the week's standout mover (WoW +12.8, MoM +33.6% OI), 13W read maxed but 52W only mid-range (69th %ile). A sharp short-cover off a deeply short base; both cohorts still short.
-- **AUD** — net long (+18% OI), high on the year, but the length is entirely leveraged funds (+17.6) with asset managers flat, and it's being pared fast (13W 8th %ile, −2.2z). The AUD-long / NZD-short gap within G10 stays wide.
-- **CAD** — net short (−29.7% OI) and building fast (WoW −8.4, MoM −22.8), the most one-directional fresh flow in G10 this month.
+**CHF** — net short −34.3% OI but stretched to the long end of its range: 98th %ile 52W, 100th %ile / +2.5z 13W, added +2.8 WoW and +6.5 MoM. This is short-covering, not a long — Hist Z −0.9 (19th %ile) keeps it below its multi-year mean. Both cohorts hold the residual short (lev −8.5, AM −25.8).
+
+**NZD** — biggest net short in G10 at −39.5% OI, but covering fast: +12.8 WoW (the week's largest move) and +33.6 MoM push 13W to the 100th %ile / +2.2z while 52W stays mid-range (69th). A 13W/52W divergence — a short being unwound at pace. Evenly held (lev −20.3, AM −19.1).
+
+**JPY** — the most crowded short on the year: 3.8th %ile, −1.7z 52W, and still building (−11.5 MoM, +0.3 WoW). Leveraged funds carry the bulk (−18.8 vs AM −11.2).
+
+**CAD** — the heaviest build into a short in G10: −8.4 WoW, −22.8 MoM, dragging 13W to the 15th %ile (−1.3z) while 52W stays mid (52nd). Evenly split (lev −14.6, AM −15.1).
+
+**AUD** — the lone G10 net long (+18.0% OI) and entirely leveraged (lev +17.6, AM +0.5) — but unwinding hard. 13W collapsed to the 7.7th %ile (−2.2z) against a 69th %ile 52W, a regime shift as fast money cuts (−6.1 WoW, −15.2 MoM).
+
+**EUR** — net long +29.8% OI held wholly by asset managers (+32.1); leveraged funds marginally short (−2.3). 52W near the floor (13.5th %ile, −1.5z) but Hist Z +0.8 (72nd %ile) — light vs the past year, still above its long-run mean. 13W back to mid (54th).
+
+**GBP** — net short −25.2% OI with the cohorts disagreeing: leveraged funds long (+9.1), asset managers short (−34.3). Mid-low range (29th %ile 52W), nudged +1.6 WoW.
 
 ## EM
-EM is uniformly net long vs USD. BRL holds the book's largest net long (+54.9% OI) — almost all asset-manager (+51.9), leveraged funds near flat (+3.0) — but sits only mid-range (50th %ile), so the long is big yet far from stretched and has room to extend; pared −12.7 MoM, added back +3.4 WoW. ZAR (+45.4) and MXN (+39.8) round out the longs. Recent flow is a trim — ZAR pared this week (WoW −7.8) and MXN's tactical read has rolled over (13W 8th %ile).
+**BRL** — the book's largest net long at +54.9% OI, but size overstates the crowding: only 50th %ile 52W (Hist Z +1.0, 77th), so it has headroom. Almost all asset-manager (+51.9), leveraged funds near flat (+3.0). Pared −12.7 MoM, added back +3.4 WoW.
+
+**ZAR** — net long +45.4% OI, asset-manager-led (+35.9, lev +9.5). Mid-range vs the year (46th %ile) though 82nd %ile on history. Cut this week: −7.8 WoW, −7.3 MoM, 13W down to the 15th %ile. Read the percentile with care given thin OI (31k).
+
+**MXN** — net long +39.8% OI, leveraged-fund-led (+27.5, AM +12.3). Trimmed to the tactical floor — 13W 7.7th %ile (−1.4z), −10.1 MoM — while 52W holds the 31st %ile. Hist Z +0.0: structurally neutral.
 
 ## At a glance
-- **Recent (52W) range extremes:** CHF (top, 98th %ile) · JPY (floor, 4th) · NZD (13W top, maxed) — *all trailing-year; none is a full-history extreme (CHF Hist 19th %ile, NZD 18th)*
-- **Biggest WoW moves (% OI):** NZD +12.8 · CAD −8.4 · ZAR −7.8 · AUD −6.1
-- **Cohort splits:** USD AM-long vs lev-short · EUR AM-long, lev-flat · AUD all-lev · BRL all-AM
-- **Level vs stretchedness:** BRL (biggest long, mid-range 52W but 77th %ile full-history → elevated, still room) · CHF (52W range-top but only 19th %ile full-history) · EUR (52W 13th %ile but 72nd full-history)
+- **52W extremes:** CHF top (98th) · DXY high (81st) · JPY floor (3.8th)
+- **13W extremes:** CHF & NZD top (100th, +2.5/+2.2z) · AUD & MXN floor (7.7th)
+- **Biggest WoW:** NZD +12.8 · CAD −8.4 · ZAR −7.8 · CHF +2.8
+- **Biggest MoM:** NZD +33.6 · CAD −22.8 · AUD −15.2 · BRL −12.7 · JPY −11.5
+- **Cohort splits:** USD AM-long vs lev-short · GBP lev-long vs AM-short · AUD all-lev · EUR/BRL/ZAR AM-led · MXN lev-led
+- **Hist extremes:** none — whole book within ±1.1 Hist Z
+- **Thin OI:** ZAR (31k)
 
 ---
-*Source: CFTC TFF Combined, COT as of 2 Jun 2026. Charts: `ytd_positioning.png` (YTD distribution of 52W scores, current × vs 1wk •), `history_positioning.png` (full-history Total Net % OI, ±2SD bands). Table: `positioning_table.csv`.*
+*Source: CFTC TFF Combined. Charts: ytd_positioning.png, history_positioning.png.*
