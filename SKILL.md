@@ -98,6 +98,16 @@ The table columns, and what each tells you:
 - **WoW Chg / MoM Chg** — change in Total Net % OI vs last week / ~4 weeks ago.
   The *flow*. Describe the biggest movers and the direction of flow.
 
+**Level and stretchedness — always read together.** Total Net is the *size and
+direction* of the position; percentile/z is how *stretched* it is vs the
+currency's own history. They are independent and both matter: a large net
+position at a mid-range percentile is big but **not crowded — it has room to
+extend** before hitting an extreme, whereas a small net position at a range
+extreme is stretched despite its size. Never report the level without the range
+position, and flag when they point different ways (e.g. BRL: the book's biggest
+long but only the 50th %ile → not stretched, headroom to extend; CHF: net short
+but at the 98th %ile → a covered short stretched toward the long end).
+
 This is a **descriptive** positioning monitor, not a trade-recommendation
 engine. Crowding is **not by itself a directional signal**: if positioning is
 justified by fundamentals/carry it can persist or extend (positioning then

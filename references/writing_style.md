@@ -69,6 +69,9 @@ Keep the whole thing to roughly one page. Density over length.
 - Extension / range position: *crowded, stretched, extended, elevated, at the
   top/bottom of its range, at a range extreme, one-sided, light, balanced,
   near the floor/ceiling of its 12-month range.*
+- Headroom (a *data* observation — distance from a crowding extreme, not a
+  price call): *not stretched, room to extend, headroom to build, far from its
+  range extreme, mid-range despite the size.*
 - Neutrality: *fairly neutral, roughly flat, close to home, mid-range, no
   strong directional skew.*
 - Flow / change: *added to, pared, trimmed, covered, built, extended,
@@ -94,10 +97,22 @@ Keep the whole thing to roughly one page. Density over length.
   WoW move into a position vs out of one is worth flagging. Describe the
   biggest movers and the direction of flow — don't editorialise it into a
   signal.
-- **Level vs range position.** Note when these diverge — e.g. a position still
-  net short in absolute terms but sitting at the *top* of its own range
-  (shorts heavily covered). Describe both the absolute net and where it sits
-  vs history; don't collapse them.
+- **Level *and* stretchedness — always together.** These are two different
+  facts and both matter. The **absolute net** (% OI) gives the *size and
+  direction* of a position; the **percentile / z-score** gives how *stretched*
+  that is vs the currency's *own* history. Report both — one without the other
+  is misleading. A large net position sitting **mid-range is big but not
+  crowded**, so it has **headroom to extend** further before reaching a
+  historical extreme; a **modest net position at a range extreme is stretched**
+  despite its size. Always say where a position sits in its range, not just how
+  big it is, and flag when level and stretchedness point different ways.
+  - Big but not stretched: *"BRL holds the book's largest net long (+54.9% OI)
+    — almost all asset-manager (+51.9), leveraged funds near flat (+3.0) — but
+    sits only mid-range (50th %ile), so the long is far from stretched and has
+    room to extend. Pared −12.7 MoM, added back +3.4 WoW."*
+  - Mirror case (stretched despite the sign): *"CHF is net short (−34% OI) yet
+    sits at the top of its range (98th %ile) — a heavily-covered short,
+    stretched toward the long end despite the negative net."*
 - **±2SD bands (history chart).** Where a currency sits vs its own ±2SD
   envelope is the cleanest "extreme or not" read. Use it to say whether the
   current print is genuinely at an extreme or merely elevated.

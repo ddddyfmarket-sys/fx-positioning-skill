@@ -1,6 +1,9 @@
 # claude-fx-positioning
 
-A **skills** that turns live CFTC positioning data into a sell-side-style FX positioning note for trader.
+An **[Agent Skill](https://www.anthropic.com/news/skills)** — works in
+[Claude Code](https://claude.com/claude-code), Cursor, OpenAI Codex, and other
+`SKILL.md`-compatible agents — that turns live CFTC positioning data into a
+sell-side-style FX positioning note for traders and macro PMs.
 
 When invoked, it:
 
@@ -13,7 +16,7 @@ When invoked, it:
 2. Produces a formatted Excel workbook, two charts (a YTD positioning-score
    distribution and a full-history time series with ±2SD bands), and a
    machine-readable CSV.
-3. Has Claude read the table and **view the charts**, then write a one-page
+3. Has the agent read the table and **view the charts**, then write a one-page
    positioning note in the house style of the JPM FX Positioning Monitor /
    Morgan Stanley G10 FX positioning reports.
 

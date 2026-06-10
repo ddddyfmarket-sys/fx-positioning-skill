@@ -22,13 +22,13 @@ Across the crosses the market is long EUR (+29.8) and AUD (+18.0) vs USD, short 
 - **CAD** — net short (−29.7% OI) and building fast (WoW −8.4, MoM −22.8), the most one-directional fresh flow in G10 this month.
 
 ## EM
-EM is uniformly net long vs USD. BRL is the largest position on the board (+54.9% OI) and almost entirely asset managers (AM +51.9 vs lev +3.0), sitting mid-range vs its own history. ZAR (+45.4) and MXN (+39.8) round out the longs. Recent flow is a trim — ZAR pared this week (WoW −7.8) and MXN's tactical read has rolled over (13W 8th %ile). Length intact, no longer being added to.
+EM is uniformly net long vs USD. BRL holds the book's largest net long (+54.9% OI) — almost all asset-manager (+51.9), leveraged funds near flat (+3.0) — but sits only mid-range (50th %ile), so the long is big yet far from stretched and has room to extend; pared −12.7 MoM, added back +3.4 WoW. ZAR (+45.4) and MXN (+39.8) round out the longs. Recent flow is a trim — ZAR pared this week (WoW −7.8) and MXN's tactical read has rolled over (13W 8th %ile).
 
 ## At a glance
 - **Range extremes:** CHF (top, 98th %ile) · JPY (floor, 4th) · NZD (13W top, maxed)
 - **Biggest WoW moves (% OI):** NZD +12.8 · CAD −8.4 · ZAR −7.8 · AUD −6.1
 - **Cohort splits:** USD AM-long vs lev-short · EUR AM-long, lev-flat · AUD all-lev · BRL all-AM
-- **Level vs range divergence:** EUR (net long but 13th %ile) · CHF (net short but range-top)
+- **Level vs stretchedness:** BRL (biggest long but 50th %ile → not stretched, room to extend) · EUR (net long but 13th %ile) · CHF (net short but range-top)
 
 ---
 *Source: CFTC TFF Combined, COT as of 2 Jun 2026. Charts: `ytd_positioning.png` (YTD distribution of 52W scores, current × vs 1wk •), `history_positioning.png` (full-history Total Net % OI, ±2SD bands). Table: `positioning_table.csv`.*
