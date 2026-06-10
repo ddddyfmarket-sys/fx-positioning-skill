@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Generated pipeline outputs (don't commit run artifacts — examples/ are kept)
+/Positioning_Data.xlsx
+/positioning_table.csv
+/ytd_positioning.png
+/history_positioning.png
+/fx_positioning_note_*.md
+~$*.xlsx
+
+# macOS
+.DS_Store
