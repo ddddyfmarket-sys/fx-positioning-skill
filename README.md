@@ -144,7 +144,7 @@ requirements.txt          Python dependencies
 
 This tool summarizes publicly available CFTC positioning data. It is not
 investment advice and produces no trade recommendations. Data is sourced from
-the CFTC; accuracy is not guaranteed. Use at your own risk.
+the CFTC
 
 ## License
 
