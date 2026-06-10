@@ -1,7 +1,7 @@
 # claude-fx-positioning
 
 A [Claude Code](https://claude.com/claude-code) **skill** that turns live CFTC
-positioning data into a sell-side-style FX positioning note for a macro PM.
+positioning data into a sell-side-style FX positioning note for trader.
 
 When invoked, it:
 
