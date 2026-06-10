@@ -27,11 +27,22 @@ table with a generic writeup is a failure, and so is good prose on stale data.
 
 ### 1. Run the pipeline
 
-From the user's working directory (so outputs land where they're working):
+The pipeline is a self-contained Python script bundled with this skill at
+`scripts/fx_positioning.py`. Run it with **the skill's own directory** as the
+script path and **the user's working directory** as the current directory (so
+outputs land where the user is working):
 
 ```bash
-python3 ~/.claude/skills/fx-positioning/scripts/fx_positioning.py
+python3 "<skill-dir>/scripts/fx_positioning.py"
 ```
+
+Replace `<skill-dir>` with the directory this `SKILL.md` lives in — your host
+provides this when the skill loads. Typical locations:
+
+- Claude Code: `~/.claude/skills/fx-positioning`
+- Cursor: `~/.cursor/skills-cursor/fx-positioning`
+- Codex: `$CODEX_HOME/skills/fx-positioning` (usually `~/.codex/skills/...`)
+- Other agents: wherever your host installs skills.
 
 - Add `--outdir <path>` to direct outputs elsewhere; default is the current
   directory.
@@ -64,6 +75,11 @@ Read all three analytical outputs before writing a word:
 
 If the script reports a currency skipped for insufficient history, say so
 rather than inventing a read.
+
+If your runtime can't view images, work from `positioning_table.csv` alone —
+its 52W/13W percentile and z-score columns capture most of what the charts
+show — and note in the output that the chart-based reads were inferred from the
+table rather than the figures.
 
 ### 3. Reading the metrics
 

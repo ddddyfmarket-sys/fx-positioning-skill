@@ -41,37 +41,69 @@ And the written note Claude produces from them: see
 
 ## Install
 
-This is a **personal skill** — it lives in `~/.claude/skills/`.
+This is a standard [Agent Skill](https://www.anthropic.com/news/skills) — a
+`SKILL.md` (YAML `name`/`description` + instructions) plus a bundled Python
+script and reference doc. The format is supported by Claude Code and adopted by
+other agent tools (Cursor, OpenAI Codex, and any host that loads `SKILL.md`
+skills), so the same repo works across all of them. The pipeline and writing
+style are plain Python + Markdown — nothing is Claude-specific.
+
+Clone it into your tool's skills directory. **Keep the folder named
+`fx-positioning`** — it must match the `name:` in `SKILL.md`.
 
 ```bash
+# Claude Code
 git clone https://github.com/ddddyfmarket-sys/claude-fx-positioning.git \
   ~/.claude/skills/fx-positioning
-pip install -r ~/.claude/skills/fx-positioning/requirements.txt
+
+# Cursor
+git clone https://github.com/ddddyfmarket-sys/claude-fx-positioning.git \
+  ~/.cursor/skills-cursor/fx-positioning
+
+# OpenAI Codex  (CODEX_HOME defaults to ~/.codex)
+git clone https://github.com/ddddyfmarket-sys/claude-fx-positioning.git \
+  "${CODEX_HOME:-$HOME/.codex}/skills/fx-positioning"
+
+# Any other agent: clone into wherever your host loads skills from.
 ```
 
-Then start (or restart) a Claude Code session — the skill is picked up
-automatically. Verify it's loaded with `/skills`.
+Then install the Python dependencies (from inside the cloned folder):
 
-> **Note:** the skill folder must be named `fx-positioning` (it matches the
-> `name:` in `SKILL.md`), hence the clone target above.
+```bash
+pip install -r requirements.txt
+```
+
+Restart your agent session so it picks up the new skill (in Claude Code,
+confirm with `/skills`).
+
+### Requirements
+
+- **Python 3** with the packages in `requirements.txt`.
+- A host/agent that can **run shell commands and read files**. Image input is
+  recommended (so the agent can view the two charts), but optional — without
+  it the skill falls back to the CSV, whose percentile/z-score columns capture
+  most of what the charts show.
 
 ## Usage
 
-In Claude Code, just ask for a positioning read, e.g.:
+In any agent that has the skill installed, just ask for a positioning read,
+e.g.:
 
 - *"Give me an FX positioning update."*
 - *"What's the CFTC/COT data saying on G10 and EM?"*
 - *"Run the FX positioning monitor."*
 
-Claude runs the pipeline and writes the note into your current working
+The agent runs the pipeline and writes the note into your current working
 directory alongside the data outputs.
 
-You can also run the pipeline directly:
+You can also run the pipeline directly (point Python at wherever you cloned the
+skill; outputs go to the current directory):
 
 ```bash
-python3 ~/.claude/skills/fx-positioning/scripts/fx_positioning.py            # outputs to CWD
-python3 ~/.claude/skills/fx-positioning/scripts/fx_positioning.py --outdir . # explicit dir
-python3 ~/.claude/skills/fx-positioning/scripts/fx_positioning.py --refresh  # bypass 24h cache
+SKILL_DIR=~/.claude/skills/fx-positioning   # or ~/.cursor/skills-cursor/fx-positioning, etc.
+python3 "$SKILL_DIR/scripts/fx_positioning.py"            # outputs to CWD
+python3 "$SKILL_DIR/scripts/fx_positioning.py" --outdir . # explicit dir
+python3 "$SKILL_DIR/scripts/fx_positioning.py" --refresh  # bypass 24h cache
 ```
 
 ### Outputs
