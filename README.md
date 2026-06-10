@@ -25,12 +25,19 @@ macro/carry/event commentary is invented.
 
 ## Example output
 
-See [`examples/sample_note.md`](examples/sample_note.md) for a full note, and
-the two charts the analysis reads:
+The Excel workbook (`Positioning_Data.xlsx`) — the formatted table with
+crowding highlights (green = crowded long, red = crowded short):
+
+![Positioning table](examples/positioning_table.png)
+
+The two charts the analysis reads (also embedded in the workbook):
 
 | YTD positioning-score distribution | Full-history net positioning (±2SD) |
 |---|---|
 | ![YTD](examples/ytd_positioning.png) | ![History](examples/history_positioning.png) |
+
+And the written note Claude produces from them: see
+[`examples/sample_note.md`](examples/sample_note.md).
 
 ## Install
 
