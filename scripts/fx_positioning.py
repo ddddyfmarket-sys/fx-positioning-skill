@@ -9,10 +9,11 @@ a formatted "FX Positioning" sheet into Positioning_Data.xlsx for 11 FX markets:
 
 Methodology
     Net % OI  = (Leveraged Funds + Asset Managers) net / Open Interest × 100
-    52W / 13W percentile >= 90  → green cell  (crowded LONG)
-    52W / 13W percentile <= 10  → red cell    (crowded SHORT)
+    Percentile >= 90 in any window → green cell  (crowded LONG)
+    Percentile <= 10 in any window → red cell    (crowded SHORT)
     Negative numbers shown in red font.
-    (Lookback windows are the last 52 and last 13 (~3M) weekly COT reports.)
+    (Lookback windows: 13W ~3M tactical, 52W ~1Y cyclical, 5Y ~260-report
+     structural; plus full-history reads in the CSV.)
 
 API response is cached locally for 24 hours so repeated runs don't hit the API.
 
@@ -45,7 +46,7 @@ from openpyxl.utils import get_column_letter
 EXCEL_NAME     = "Positioning_Data.xlsx"
 SHEET_NAME     = "FX Positioning"
 DATA_START_ROW = 6
-N_COLS         = 11
+N_COLS         = 13
 
 
 def resolve_outdir() -> Path:
@@ -247,15 +248,19 @@ def compute_row(ccy: str, ccy_data: dict) -> dict | None:
     latest = ccy_data["latest"]
     prev   = ccy_data["prev"]
 
-    # Lookback windows of the Total Net % OI series (most recent N reports).
-    # 52W ≈ 1Y; 13W ≈ 3M. The 13-week window is enough observations for the
-    # percentile/Z to be reasonably meaningful (a 4-week window was too thin).
-    hist_52w  = [r["total_net_pct"] for r in history[-52:]]
+    # Lookback windows of the Total Net % OI series (most recent N reports),
+    # ordered by horizon: 13W ≈ 3M (tactical), 52W ≈ 1Y (cyclical), 5Y ≈ 260
+    # weekly reports (structural/multi-year). The 13-week window is the shortest
+    # that keeps the percentile/Z reasonably meaningful (a 4-week window was too
+    # thin). Where a currency has fewer than a window's worth of reports, the
+    # slice simply uses all available — pctl_rank / z_score guard small n.
     hist_13w  = [r["total_net_pct"] for r in history[-13:]]
+    hist_52w  = [r["total_net_pct"] for r in history[-52:]]
+    hist_5y   = [r["total_net_pct"] for r in history[-260:]]
     hist_full = [r["total_net_pct"] for r in history]   # full history (2006→); this
     #                                                     is the baseline the ±2SD
     #                                                     bands on the history chart
-    #                                                     use — NOT the 52W window.
+    #                                                     use — NOT a fixed window.
 
     cur   = latest["total_net_pct"]
     wow   = cur - prev["total_net_pct"]                 # vs last week (history[-2])
@@ -265,10 +270,12 @@ def compute_row(ccy: str, ccy_data: dict) -> dict | None:
 
     return {
         "CCY":        ccy,
-        "52W Pctl":   p52_r,
-        "52W Z":      round(z_score(cur, hist_52w), 2),
         "13W Pctl":   round(pctl_rank(cur, hist_13w), 1),
         "13W Z":      round(z_score(cur, hist_13w), 2),
+        "52W Pctl":   p52_r,
+        "52W Z":      round(z_score(cur, hist_52w), 2),
+        "5Y Pctl":    round(pctl_rank(cur, hist_5y), 1),
+        "5Y Z":       round(z_score(cur, hist_5y), 2),
         # Full-history reads — the correct basis for any "±2SD band / historic
         # extreme" statement (the history chart's bands are full-history). These
         # can diverge sharply from the 52W reads: a position can sit at the top
@@ -305,16 +312,16 @@ _THIN     = Side(style="thin", color="D9D9D9")
 _BORDER   = Border(left=_THIN, right=_THIN, top=_THIN, bottom=_THIN)
 _ALT_FILL = PatternFill("solid", fgColor="F5F8FD")
 
-# Col:  1=CCY  2=52W Pctl  3=52W Z  4=13W Pctl  5=13W Z
-#       6=WoW  7=MoM  8=Total Net  9=Lev  10=AstMgr  11=OI
+# Col:  1=CCY  2=13W Pctl  3=13W Z  4=52W Pctl  5=52W Z  6=5Y Pctl  7=5Y Z
+#       8=WoW  9=MoM  10=Total Net  11=Lev  12=AstMgr  13=OI
 _NUMFMT = {
-    2: "0.0", 3: "0.00", 4: "0.0", 5: "0.00",
-    6: "+0.00;-0.00", 7: "+0.00;-0.00",
-    8: "0.00", 9: "0.00", 10: "0.00", 11: "#,##0",
+    2: "0.0", 3: "0.00", 4: "0.0", 5: "0.00", 6: "0.0", 7: "0.00",
+    8: "+0.00;-0.00", 9: "+0.00;-0.00",
+    10: "0.00", 11: "0.00", 12: "0.00", 13: "#,##0",
 }
-_COL_WIDTHS = [10, 7, 7.5, 7, 7.5, 8, 8, 8, 8, 8.5, 11]
-_PCTL_COLS  = {2, 4}
-_NEG_COLS   = set(range(3, 11))
+_COL_WIDTHS = [10, 7, 7.5, 7, 7.5, 7, 7.5, 8, 8, 8, 8, 8.5, 11]
+_PCTL_COLS  = {2, 4, 6}                    # 13W / 52W / 5Y percentile columns
+_NEG_COLS   = {3, 5, 7, 8, 9, 10, 11, 12}  # Z, change & net columns (red if < 0)
 
 
 def _safe_merge(ws, r1, c1, r2, c2):
@@ -332,11 +339,12 @@ def _write_headers(ws) -> None:
 
     for c1, c2, label in [
         (1,  1,  None),
-        (2,  3,  "52W (% OI)"),
-        (4,  5,  "13W (% OI)"),
-        (6,  7,  "CHANGES (% OI)"),
-        (8,  10, "NET POSITION (% OI)"),
-        (11, 11, None),
+        (2,  3,  "13W (% OI)"),
+        (4,  5,  "52W (% OI)"),
+        (6,  7,  "5Y (% OI)"),
+        (8,  9,  "CHANGES (% OI)"),
+        (10, 12, "NET POSITION (% OI)"),
+        (13, 13, None),
     ]:
         if c1 < c2:
             _safe_merge(ws, 4, c1, 4, c2)
@@ -351,9 +359,10 @@ def _write_headers(ws) -> None:
         (1, "CCY"),
         (2, "Pctl"), (3, "Z-Score"),
         (4, "Pctl"), (5, "Z-Score"),
-        (6, "WoW"),  (7, "MoM"),
-        (8, "Total"), (9, "Lev"), (10, "AstMgr"),
-        (11, "OI"),
+        (6, "Pctl"), (7, "Z-Score"),
+        (8, "WoW"),  (9, "MoM"),
+        (10, "Total"), (11, "Lev"), (12, "AstMgr"),
+        (13, "OI"),
     ]:
         c = ws.cell(5, col)
         c.value, c.fill, c.font, c.alignment = label, _HDR_SUB_FILL, _HDR_SUB_FONT, _HDR_SUB_ALGN
@@ -365,7 +374,8 @@ def _write_headers(ws) -> None:
 
 def _write_data_row(ws, row_num: int, r: dict, zebra: bool) -> None:
     vals = [
-        r["CCY"], r["52W Pctl"], r["52W Z"], r["13W Pctl"], r["13W Z"],
+        r["CCY"], r["13W Pctl"], r["13W Z"], r["52W Pctl"], r["52W Z"],
+        r["5Y Pctl"], r["5Y Z"],
         r["WoW Chg"], r["MoM Chg"], r["Total Net"], r["LevFd Net"],  r["AstMgr Net"],
         r["Open Int"],
     ]
@@ -635,9 +645,9 @@ def write_excel(fx_rows: list[dict], fx_data: dict, cot_date, outdir: Path) -> N
     # Legend
     foot_row = DATA_START_ROW + len(CCY_ORDER) + 1
     for i, (text, bold) in enumerate([
-        ("POSITIONING HIGHLIGHTS  (based on percentile of Net % OI)", True),
-        ("  Green cell: percentile ≥ 90th (crowded LONG) — contrarian short risk", False),
-        ("  Red cell:   percentile ≤ 10th (crowded SHORT) — contrarian long risk", False),
+        ("POSITIONING HIGHLIGHTS  (percentile of Net % OI within each window: 13W / 52W / 5Y)", True),
+        ("  Green cell: percentile ≥ 90th — at the long end of its range for that window", False),
+        ("  Red cell:   percentile ≤ 10th — at the short end of its range for that window", False),
         ("NET = Leveraged Funds + Asset Managers as % of Open Interest  "
          "(Source: CFTC TFF, Futures+Options Combined)", False),
     ]):
@@ -680,7 +690,8 @@ def write_table_csv(fx_rows: list[dict], cot_date, outdir: Path) -> None:
     AM-vs-lev divergence is a core part of the positioning read."""
     import csv
 
-    cols = ["CCY", "52W Pctl", "52W Z", "13W Pctl", "13W Z", "Hist Z", "Hist Pctl",
+    cols = ["CCY", "13W Pctl", "13W Z", "52W Pctl", "52W Z", "5Y Pctl", "5Y Z",
+            "Hist Z", "Hist Pctl",
             "WoW Chg", "MoM Chg", "Total Net", "LevFd Net", "AstMgr Net",
             "Open Int", "Date"]
     path = outdir / "positioning_table.csv"
@@ -688,10 +699,11 @@ def write_table_csv(fx_rows: list[dict], cot_date, outdir: Path) -> None:
         w = csv.writer(f)
         w.writerow([f"# FX Positioning Monitor — COT as of {cot_date}. "
                     f"Net = (Leveraged Funds + Asset Managers) long − short as % of "
-                    f"Open Interest. 52W/13W Pctl & Z are vs trailing 52- and 13-week "
-                    f"windows (recent crowding). Hist Z / Hist Pctl are vs FULL history "
-                    f"(2006→) — this is the basis for the history chart's ±2SD bands and "
-                    f"for any 'historic extreme' read. The two windows can diverge sharply."])
+                    f"Open Interest. 13W/52W/5Y Pctl & Z are vs trailing 13-week, 52-week "
+                    f"and 5-year (260-report) windows — horizons from tactical to "
+                    f"structural. Hist Z / Hist Pctl are vs FULL history (2006→) — the "
+                    f"basis for the history chart's ±2SD bands and any 'historic extreme' "
+                    f"read. Windows can diverge sharply; cite the one you mean."])
         w.writerow(cols)
         for r in fx_rows:
             w.writerow([r.get(c, "") for c in cols])
@@ -701,12 +713,12 @@ def write_table_csv(fx_rows: list[dict], cot_date, outdir: Path) -> None:
 # ── Console summary ───────────────────────────────────────────────────────────
 
 def print_summary(fx_rows: list[dict], cot_date) -> None:
-    hdr = (f"{'CCY':8s} {'52W%':>6s} {'52WZ':>6s} "
-           f"{'13W%':>5s} {'13WZ':>5s} {'WoW':>7s} {'MoM':>7s} {'Net%':>7s}")
-    print(f"\n{'='*72}")
+    hdr = (f"{'CCY':8s} {'13W%':>5s} {'13WZ':>5s} {'52W%':>6s} {'52WZ':>6s} "
+           f"{'5Y%':>5s} {'5YZ':>5s} {'WoW':>7s} {'MoM':>7s} {'Net%':>7s}")
+    print(f"\n{'='*84}")
     print(f"  FX Positioning Monitor  |  COT as of {cot_date}")
     print(f"  Net = (Lev Funds + Asset Mgr) long − short, as % of Open Interest")
-    print(f"{'='*72}")
+    print(f"{'='*84}")
     print(f"  {hdr}")
     print(f"  {'-'*len(hdr)}")
     for r in fx_rows:
@@ -714,11 +726,12 @@ def print_summary(fx_rows: list[dict], cot_date) -> None:
         flag = (" [CROWD LONG]"  if r["52W Pctl"] >= 90
                 else " [CROWD SHORT]" if r["52W Pctl"] <= 10 else "")
         print(f"  {r['CCY']:8s} "
-              f"{r['52W Pctl']:6.1f} {r['52W Z']:+6.2f} "
               f"{r['13W Pctl']:5.1f} {r['13W Z']:+5.2f} "
+              f"{r['52W Pctl']:6.1f} {r['52W Z']:+6.2f} "
+              f"{r['5Y Pctl']:5.1f} {r['5Y Z']:+5.2f} "
               f"{r['WoW Chg']:+7.2f} {mom} "
               f"{r['Total Net']:+7.2f}{flag}")
-    print(f"{'='*72}\n")
+    print(f"{'='*84}\n")
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────

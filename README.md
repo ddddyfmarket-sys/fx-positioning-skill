@@ -11,8 +11,9 @@ When invoked, it:
    (Traders in Financial Futures), Futures+Options Combined** data from the
    CFTC Socrata API for 11 markets — **EUR, JPY, GBP, CHF, CAD, AUD, NZD, MXN,
    BRL, ZAR, DXY** — and computes **Leveraged-Funds + Asset-Manager net
-   positioning as a % of open interest**, with 52-week and 13-week percentiles
-   and z-scores, week-over-week and month-over-month changes.
+   positioning as a % of open interest**, with 13-week, 52-week and 5-year
+   percentiles and z-scores (tactical → cyclical → structural), full-history
+   z-scores, and week-over-week and month-over-month changes.
 2. Produces a formatted Excel workbook, two charts (a YTD positioning-score
    distribution and a full-history time series with ±2SD bands), and a
    machine-readable CSV.
@@ -134,11 +135,14 @@ requirements.txt          Python dependencies
 
 - **Net % OI** = (Leveraged Funds net + Asset Managers net) / Open Interest × 100,
   using CFTC TFF Futures+Options Combined.
-- **Percentile** = where the latest Total Net % OI sits within its trailing
-  52-week / 13-week window (crowding / range position).
+- **Percentile** = where the latest Total Net % OI sits within a lookback
+  window (crowding / range position).
 - **Z-score** = standard deviations of the latest reading from the mean of that
   window (extension).
-- 52W ≈ the cyclical read; 13W ≈ the tactical/recent read.
+- **Lookback windows:** 13W ≈ tactical/recent · 52W ≈ cyclical (1Y) · 5Y ≈
+  structural/multi-year (260 reports) · plus full-history `Hist Z` / `Hist Pctl`
+  (the basis for the chart's ±2SD bands and any all-time-extreme read). The
+  windows can diverge — a position can be at its 13W floor yet near its 5Y high.
 
 ## Disclaimer
 

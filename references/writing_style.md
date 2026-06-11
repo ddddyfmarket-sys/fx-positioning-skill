@@ -90,9 +90,16 @@ Keep the whole thing to roughly one page. Density over length.
   `positioning_table.csv` has both legs; use them.
 - **Percentile vs z-score.** Percentile = where today sits in the range
   (how crowded/extended). Z-score = how many SD from the mean. A high
-  percentile with a modest z is range-bound-high; a high z is a genuine
-  outlier. 52W = the cyclical read, 13W = the tactical/recent read. When 13W
-  and 52W disagree, a regime shift is in progress — name it descriptively.
+  percentile with a modest z is range-bound-high; a high z is a genuine outlier.
+- **Three horizons — name the one you mean.** 13W = tactical/recent, 52W =
+  cyclical (1Y), 5Y = structural/multi-year; plus Hist (full history) for the
+  ±2SD bands. The windows nest, and when they disagree *that is the signal*: a
+  position can be at its 13W floor yet near its 5Y high (being cut but still
+  structurally large), or fresh on the year but neutral over 5Y. Spell the
+  divergence out descriptively — it's the difference between a tactical wobble
+  and a structural shift. Don't quote all three windows for every currency;
+  lead with the one that carries the point and bring in another only when they
+  diverge.
 - **WoW / MoM flow.** The *change* often matters as much as the level. A large
   WoW move into a position vs out of one is worth flagging. Describe the
   biggest movers and the direction of flow — don't editorialise it into a

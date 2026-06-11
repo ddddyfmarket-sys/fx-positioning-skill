@@ -5,7 +5,7 @@ description: >-
   data. Runs the bundled fx_positioning.py (fetches CFTC TFF Futures+Options
   Combined data for EUR, JPY, GBP, CHF, CAD, AUD, NZD, MXN, BRL, ZAR and DXY,
   computes Leveraged-Funds + Asset-Manager net positioning as % of open
-  interest with 52W/13W percentiles and z-scores, WoW/MoM changes, a YTD
+  interest with 13W/52W/5Y percentiles and z-scores, WoW/MoM changes, a YTD
   distribution chart and a full-history chart), then writes a macro-PM-grade
   positioning note in the style of the JPM FX Positioning Monitor / Morgan
   Stanley G10 FX positioning reports. Use this skill whenever the user asks
@@ -80,7 +80,7 @@ If the script reports a currency skipped for insufficient history, say so
 rather than inventing a read.
 
 If your runtime can't view images, work from `positioning_table.csv` alone —
-its 52W/13W and full-history (Hist Z / Hist Pctl) columns capture the
+its 13W/52W/5Y and full-history (Hist Z / Hist Pctl) columns capture the
 positioning state — and note in the output that the chart-based reads were
 inferred from the table rather than the figures.
 
@@ -93,18 +93,28 @@ The table columns, and what each tells you:
   position. (DXY is the dollar itself: positive = net long USD.)
 - **LevFd Net / AstMgr Net** — the two cohorts that sum to Total Net. Fast
   money vs real money. When they disagree, that's a story — surface it.
-- **52W Pctl / 52W Z** — crowding and extension vs the trailing year (the
-  cyclical read). Pctl ≥ 90 = crowded long; ≤ 10 = crowded short. Z = SDs from
-  the 52W mean.
-- **13W Pctl / 13W Z** — the same, vs the last ~3 months (the tactical read).
-  When 13W and 52W diverge, a regime shift is underway — name it.
+
+The percentile/z columns come in **three nested lookback windows** — read them
+as a horizon ladder, and always name which one you mean:
+
+- **13W Pctl / 13W Z** — vs the last ~3 months: the **tactical** read (recent
+  build/unwind).
+- **52W Pctl / 52W Z** — vs the trailing year: the **cyclical** read. Pctl ≥ 90
+  = at the long end of the range; ≤ 10 = at the short end. Z = SDs from the mean.
+- **5Y Pctl / 5Y Z** — vs the last ~5 years (260 reports): the **structural /
+  multi-year** read. This is what catches a position that looks unremarkable on
+  the year but is stretched on a multi-year basis, or vice versa (e.g. AUD here
+  is only the 7.7th %ile on 13W yet the 93.8th / +2.2z on 5Y — tactically being
+  cut, but still structurally a large long). When the windows disagree, that
+  *is* the story — a regime shift or a position rebuilding/unwinding — so spell
+  it out.
 - **Hist Z / Hist Pctl** — the position vs its **full history** (2006→). This,
-  *not* the 52W/13W stat, is what the history chart's ±2SD bands reflect, and
-  the only correct basis for any "historic extreme / pressing its ±2SD band /
-  multi-year high-low" claim. **Use the right window:** 52W/13W = *recent*
-  crowding; Hist = *historic* extreme. They can diverge sharply — never map one
-  onto the other, and never eyeball an extreme off the small chart subplots when
-  the number is right here in the table. (Worked example: CHF reads 98th %ile /
+  *not* the 13W/52W/5Y windowed stat, is what the history chart's ±2SD bands
+  reflect, and the only correct basis for any "historic extreme / pressing its
+  ±2SD band / multi-year high-low" claim. **Use the right window:** 13W/52W/5Y =
+  *windowed* crowding; Hist = *all-time* extreme. They can diverge sharply —
+  never map one onto the other, and never eyeball an extreme off the small chart
+  subplots when the number is right here in the table. (Worked example: CHF reads 98th %ile /
   +1.8z on 52W — top of the *past year*, shorts covered — but only 19th %ile /
   −0.9 Hist Z, i.e. *below* its long-run mean and still net short. So it is
   **not** near its upper ±2SD band; the history chart shows it in the lower,
