@@ -3,7 +3,7 @@
 An **[Agent Skill](https://www.anthropic.com/news/skills)** — works in
 [Claude Code](https://claude.com/claude-code), Cursor, OpenAI Codex, and other
 `SKILL.md`-compatible agents — that turns live CFTC positioning data into a
-sell-side-style FX positioning note for traders and macro PMs.
+sell-side-style FX positioning note for traders.
 
 When invoked, it:
 
