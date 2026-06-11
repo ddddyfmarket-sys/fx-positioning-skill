@@ -23,7 +23,7 @@ USD positioning is long but shallow. DXY net +8.8% OI reads 81st %ile / +1.1z ag
 
 **CAD** — the heaviest build into a short in G10: −8.4 WoW, −22.8 MoM, dragging 13W to the 15th %ile (−1.3z) while 52W stays mid (52nd). Evenly split (lev −14.6, AM −15.1).
 
-**AUD** — the lone G10 net long (+18.0% OI) and entirely leveraged (lev +17.6, AM +0.5) — but unwinding hard. 13W collapsed to the 7.7th %ile (−2.2z) against a 69th %ile 52W, a regime shift as fast money cuts (−6.1 WoW, −15.2 MoM).
+**AUD** — net long +18.0% OI and entirely leveraged (lev +17.6, AM +0.5), but the horizons split hard: 13W collapsed to the 7.7th %ile (−2.2z) against a 5Y 93.8th %ile (+2.2z). Structurally a large long, being cut tactically as fast money trims (−6.1 WoW, −15.2 MoM).
 
 **EUR** — net long +29.8% OI held wholly by asset managers (+32.1); leveraged funds marginally short (−2.3). 52W near the floor (13.5th %ile, −1.5z) but Hist Z +0.8 (72nd %ile) — light vs the past year, still above its long-run mean. 13W back to mid (54th).
 
@@ -42,6 +42,7 @@ USD positioning is long but shallow. DXY net +8.8% OI reads 81st %ile / +1.1z ag
 - **Biggest WoW:** NZD +12.8 · CAD −8.4 · ZAR −7.8 · CHF +2.8
 - **Biggest MoM:** NZD +33.6 · CAD −22.8 · AUD −15.2 · BRL −12.7 · JPY −11.5
 - **Cohort splits:** USD AM-long vs lev-short · GBP lev-long vs AM-short · AUD all-lev · EUR/BRL/ZAR AM-led · MXN lev-led
+- **Multi-horizon split:** AUD 13W floor (7.7th) vs 5Y top (93.8th, +2.2z)
 - **Hist extremes:** none — whole book within ±1.1 Hist Z
 - **Thin OI:** ZAR (31k)
 
