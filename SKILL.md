@@ -52,18 +52,20 @@ provides this when the skill loads. Typical locations:
 - Dependencies (`requests`, `openpyxl`, `matplotlib`, `numpy`) are normally
   present. If a run fails on a missing package, install it and retry once.
 
-The script writes four files to the output directory:
+The script writes five files to the output directory:
 
 | File | What it is |
 |---|---|
 | `positioning_table.csv` | The table incl. the Leveraged-Funds vs Asset-Manager split. **Source of truth for all numbers you cite.** |
 | `ytd_positioning.png` | YTD distribution box plot: each currency's YTD range of 52W z-scores, with current (×) and 1-week-ago (•) marked. |
 | `history_positioning.png` | Full-history small multiples per currency, y-axis = full-history percentile of Total Net % OI (0–100), with 90th/10th range-end bands and the 50th-percentile median. |
-| `Positioning_Data.xlsx` | Formatted table + both charts embedded — the deliverable workbook for the PM. |
+| `momentum_positioning.png` | **Supplementary** cross-sectional scatter: y = current 52W z-score (level), x = 1-month change in that 52W z-score (momentum), one dot per currency. Quadrants read as long/short × adding/paring (top-right = long & extending, bottom-right = short & covering). |
+| `Positioning_Data.xlsx` | Formatted table + all three charts embedded — the deliverable workbook for the PM. |
 
 ### 2. Read the outputs
 
-Read all three analytical outputs before writing a word:
+Read the analytical outputs before writing a word. The first three are the core
+read; the fourth (momentum scatter) is a supplement:
 
 1. `positioning_table.csv` — every number you cite comes from here. Note the
    COT date in the header comment; lead the note with it.
@@ -79,6 +81,19 @@ Read all three analytical outputs before writing a word:
    genuine multi-year *extreme* read, still cross-check `Hist Z` in the table
    (|Hist Z| ≳ 2 is a true outlier); the 90th/10th bands flag range ends, which
    is a softer bar than ±2SD.
+4. `momentum_positioning.png` *(supplement)* — the cross-sectional **level vs
+   momentum** snapshot: y = current 52W z-score (how stretched on the year),
+   x = the 1-month change in that same 52W z-score (which way, and how fast,
+   the book is moving). The four quadrants are long/short (above/below 0) ×
+   adding/paring (right/left of 0): **top-right** = net long & extending,
+   **top-left** = long but paring, **bottom-right** = short but covering,
+   **bottom-left** = short & extending. Use it to group the board by trajectory
+   — who is converging on a crowded level vs unwinding off one — and to flag
+   positions that are mid-level on the year but moving *fast* (accelerating
+   toward crowding). The y-axis equals the `52W Z` column and the x-axis is a
+   z-space analogue of `MoM Chg`, so it adds no new numbers — it reorganises
+   the table's level + flow into a picture. It's a supplement, not a
+   replacement: don't let it override the level/percentile read from the table.
 
 If the script reports a currency skipped for insufficient history, say so
 rather than inventing a read.
@@ -178,10 +193,12 @@ structure:
 <a compact scoreboard, NOT prose that repeats the sections above. One terse line each — e.g. "Range extremes: CHF (top, 98%ile) · JPY (floor, 4th) · NZD (13W top, 100th)" / "Biggest WoW: NZD +12.8 · CAD −8.4 · ZAR −7.8" / "Cohort splits: USD AM-long vs lev-short · AUD all-lev · BRL all-AM". If it would just restate the body in full sentences, cut it.>
 
 ---
-*Source: CFTC TFF Combined. Charts: ytd_positioning.png, history_positioning.png.*
+*Source: CFTC TFF Combined. Charts: ytd_positioning.png, history_positioning.png, momentum_positioning.png.*
 ```
 
-Reference the two charts by name so the PM knows which figure backs each read.
+Reference the charts by name so the PM knows which figure backs each read. The
+YTD and history charts are the core evidence; cite `momentum_positioning.png`
+when you make a level-vs-trajectory point (who's adding to vs paring a position).
 
 ### Punch and no repetition
 

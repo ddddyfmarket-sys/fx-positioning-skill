@@ -14,9 +14,10 @@ When invoked, it:
    positioning as a % of open interest**, with 13-week, 52-week and 5-year
    percentiles and z-scores (tactical → cyclical → structural), full-history
    z-scores, and week-over-week and month-over-month changes.
-2. Produces a formatted Excel workbook, two charts (a YTD positioning-score
-   distribution and a full-history time series on a full-history percentile
-   y-axis), and a machine-readable CSV.
+2. Produces a formatted Excel workbook, three charts (a YTD positioning-score
+   distribution, a full-history time series on a full-history percentile
+   y-axis, and a supplementary level-vs-momentum scatter), and a
+   machine-readable CSV.
 3. Has the agent read the table and **view the charts**, then write a one-page
    positioning note in the house style of the JPM FX Positioning Monitor /
    Morgan Stanley G10 FX positioning reports.
@@ -33,11 +34,18 @@ crowding highlights (green = crowded long, red = crowded short):
 
 ![Positioning table](examples/positioning_table.png)
 
-The two charts the analysis reads (also embedded in the workbook):
+The charts the analysis reads (also embedded in the workbook):
 
 | YTD positioning-score distribution | Full-history percentile of net positioning |
 |---|---|
 | ![YTD](examples/ytd_positioning.png) | ![History](examples/history_positioning.png) |
+
+Plus a supplementary **level-vs-momentum** scatter — y = current 52W z-score
+(how stretched on the year), x = the 1-month change in that z-score (which way
+the book is moving), one dot per currency; quadrants read as long/short ×
+adding/paring:
+
+![Momentum](examples/momentum_positioning.png)
 
 And the written note Claude produces from them: see
 [`examples/sample_note.md`](examples/sample_note.md).
@@ -83,7 +91,7 @@ confirm with `/skills`).
 
 - **Python 3** with the packages in `requirements.txt`.
 - A host/agent that can **run shell commands and read files**. Image input is
-  recommended (so the agent can view the two charts), but optional — without
+  recommended (so the agent can view the charts), but optional — without
   it the skill falls back to the CSV, whose percentile/z-score columns capture
   most of what the charts show.
 
@@ -116,7 +124,8 @@ python3 "$SKILL_DIR/scripts/fx_positioning.py" --refresh  # bypass 24h cache
 | `positioning_table.csv` | The table incl. the Leveraged-Funds vs Asset-Manager split — the source of truth for every number in the note. |
 | `ytd_positioning.png` | YTD distribution of each currency's 52W positioning score, with current (×) and 1-week-ago (•) marked. |
 | `history_positioning.png` | Full-history small multiples per currency: y-axis = full-history percentile of Total Net % OI (0–100), with 90th/10th range-end bands and the 50th-percentile median. |
-| `Positioning_Data.xlsx` | Formatted table + both charts embedded. |
+| `momentum_positioning.png` | Supplementary level-vs-momentum scatter: y = current 52W z-score, x = 1-month change in that z-score, one dot per currency; quadrants = long/short × adding/paring. |
+| `Positioning_Data.xlsx` | Formatted table + all three charts embedded. |
 
 The CFTC API response is cached locally (`~/.fx_cache/`) for 24h, so repeated
 runs are fast and don't re-hit the API.

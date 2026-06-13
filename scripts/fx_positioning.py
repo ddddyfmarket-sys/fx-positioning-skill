@@ -18,9 +18,10 @@ Methodology
 API response is cached locally for 24 hours so repeated runs don't hit the API.
 
 Outputs (written to --outdir, default = current working directory):
-    Positioning_Data.xlsx   formatted table + both charts embedded
+    Positioning_Data.xlsx    formatted table + all three charts embedded
     ytd_positioning.png      standalone YTD distribution box plot
     history_positioning.png  full-history small-multiples, y-axis = full-history percentile
+    momentum_positioning.png level (52W Z) vs 1M change in 52W Z scatter, one dot per ccy
     positioning_table.csv    machine-readable table incl. Lev / AstMgr split
 
 Usage:
@@ -602,6 +603,103 @@ def _make_history_chart(fx_data: dict):
     return buf
 
 
+# ── Momentum scatter: level vs 1-month change in 52W Z-score ──────────────────
+
+def _z52_at(values: list[float], end_idx: int) -> float:
+    """52W Z-score of the observation at position `end_idx`, computed on its own
+    trailing 52-report window (end_idx-51 .. end_idx inclusive). Lets us read the
+    Z-score as it stood N weeks ago, so a change in Z is measured on the matching
+    shifted window rather than against today's window."""
+    window = values[max(0, end_idx - 51): end_idx + 1]
+    return z_score(values[end_idx], window) if len(window) >= 2 else 0.0
+
+
+def _make_momentum_scatter(fx_data: dict, lag: int = 4):
+    """Scatter of positioning *level* vs *momentum*, one dot per currency:
+
+        y = current 52W Z-score (how stretched the position is on the year)
+        x = change in that 52W Z-score over the last `lag` reports (~1 month)
+
+    Recomputes each point's prior 52W Z on its own shifted window, so the x-axis
+    is a true change in the standardized score, not a raw %OI delta. The four
+    quadrants read as long/short (above/below 0) × adding/paring (right/left):
+    top-right = long & extending, bottom-right = short & covering, etc. This is a
+    supplement to the YTD/history charts — the cross-sectional 'where is each
+    book, and which way is it moving' snapshot."""
+    try:
+        import matplotlib
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as plt
+    except Exception as e:
+        print(f"  Momentum scatter skipped: {e}")
+        return None
+
+    pts = []  # (ccy, x=ΔZ over lag, y=level Z)
+    for ccy in CCY_ORDER:
+        history = fx_data.get(ccy, {}).get("history", [])
+        vals = [r["total_net_pct"] for r in history]
+        if len(vals) < 52 + lag + 1:
+            continue  # need a full 52W window both now and `lag` reports ago
+        z_now = _z52_at(vals, len(vals) - 1)
+        z_lag = _z52_at(vals, len(vals) - 1 - lag)
+        pts.append((ccy, z_now - z_lag, z_now))
+
+    if not pts:
+        print("  Momentum scatter skipped: no currency has enough history")
+        return None
+
+    fig, ax = plt.subplots(figsize=(9, 7))
+    xs = [p[1] for p in pts]
+    ys = [p[2] for p in pts]
+    ax.scatter(xs, ys, s=70, color="#2F5496", zorder=5,
+               edgecolor="white", linewidth=0.7)
+    for ccy, x, y in pts:                       # highlight the dollar index
+        if ccy == "DXY":
+            ax.scatter([x], [y], s=90, color="#27AAE1", zorder=6,
+                       edgecolor="white", linewidth=0.8)
+
+    # Per-currency label nudges to limit overlap in the central cluster.
+    off = {"EUR": (8, 4), "JPY": (8, -12), "GBP": (8, 4), "CHF": (8, 4),
+           "CAD": (-12, 8), "AUD": (8, 4), "NZD": (-14, -12), "MXN": (8, -4),
+           "BRL": (8, 6), "ZAR": (8, -12), "DXY": (10, 6)}
+    for ccy, x, y in pts:
+        dx, dy = off.get(ccy, (8, 4))
+        ax.annotate(ccy, (x, y), fontsize=9, fontweight="bold", color="#1F3864",
+                    xytext=(dx, dy), textcoords="offset points")
+
+    ax.axhline(0, color="#888", linewidth=1.0)
+    ax.axvline(0, color="#888", linewidth=1.0)
+    xpad = max(0.6, max(abs(v) for v in xs) * 1.25)
+    ypad = max(0.6, max(abs(v) for v in ys) * 1.25)
+    ax.set_xlim(-xpad, xpad)
+    ax.set_ylim(-ypad, ypad)
+
+    q = dict(fontsize=7.5, color="#AAAAAA", ha="center", va="center", style="italic")
+    ax.text( xpad * 0.6,  ypad * 0.92, "LONG & extending", **q)
+    ax.text(-xpad * 0.6,  ypad * 0.92, "LONG, paring",     **q)
+    ax.text( xpad * 0.6, -ypad * 0.92, "SHORT, covering",  **q)
+    ax.text(-xpad * 0.6, -ypad * 0.92, "SHORT & extending", **q)
+
+    ax.set_xlabel(f"1-Month Change in Z-Score (52W, vs {lag} reports ago)", fontsize=10)
+    ax.set_ylabel("Level Z-Score (52W)", fontsize=10)
+    cot_date = max(h["date"] for v in fx_data.values() for h in [v["history"][-1]])
+    ax.set_title(
+        "FX Speculative Positioning: Level vs 1M Change in Z-Score (52W)\n"
+        f"CFTC TFF Combined — (Lev Funds + Asset Mgrs) Net %OI · COT {cot_date}",
+        fontsize=11, fontweight="bold", color="#1F3864",
+    )
+    ax.grid(True, linestyle="--", color="#DDD", alpha=0.5, zorder=0)
+    for sp in ("top", "right"):
+        ax.spines[sp].set_visible(False)
+
+    fig.tight_layout()
+    buf = io.BytesIO()
+    fig.savefig(buf, format="png", dpi=140, bbox_inches="tight", facecolor="white")
+    plt.close(fig)
+    buf.seek(0)
+    return buf
+
+
 # ── Write Excel ───────────────────────────────────────────────────────────────
 
 def write_excel(fx_rows: list[dict], fx_data: dict, cot_date, outdir: Path) -> None:
@@ -686,7 +784,17 @@ def write_excel(fx_rows: list[dict], fx_data: dict, cot_date, outdir: Path) -> N
         img = XLImage(buf)
         img.anchor = f"A{chart_row}"
         ws.add_image(img)
+        chart_row += 27
         print("  Saved → history_positioning.png")
+
+    buf = _make_momentum_scatter(fx_data)
+    if buf:
+        (outdir / "momentum_positioning.png").write_bytes(buf.getvalue())
+        buf.seek(0)
+        img = XLImage(buf)
+        img.anchor = f"A{chart_row}"
+        ws.add_image(img)
+        print("  Saved → momentum_positioning.png")
 
     wb.save(excel_path)
     print(f"  Saved → {excel_path.name}")
