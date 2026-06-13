@@ -15,8 +15,8 @@ When invoked, it:
    percentiles and z-scores (tactical → cyclical → structural), full-history
    z-scores, and week-over-week and month-over-month changes.
 2. Produces a formatted Excel workbook, two charts (a YTD positioning-score
-   distribution and a full-history time series with ±2SD bands), and a
-   machine-readable CSV.
+   distribution and a full-history time series on a full-history percentile
+   y-axis), and a machine-readable CSV.
 3. Has the agent read the table and **view the charts**, then write a one-page
    positioning note in the house style of the JPM FX Positioning Monitor /
    Morgan Stanley G10 FX positioning reports.
@@ -35,7 +35,7 @@ crowding highlights (green = crowded long, red = crowded short):
 
 The two charts the analysis reads (also embedded in the workbook):
 
-| YTD positioning-score distribution | Full-history net positioning (±2SD) |
+| YTD positioning-score distribution | Full-history percentile of net positioning |
 |---|---|
 | ![YTD](examples/ytd_positioning.png) | ![History](examples/history_positioning.png) |
 
@@ -115,7 +115,7 @@ python3 "$SKILL_DIR/scripts/fx_positioning.py" --refresh  # bypass 24h cache
 |---|---|
 | `positioning_table.csv` | The table incl. the Leveraged-Funds vs Asset-Manager split — the source of truth for every number in the note. |
 | `ytd_positioning.png` | YTD distribution of each currency's 52W positioning score, with current (×) and 1-week-ago (•) marked. |
-| `history_positioning.png` | Full-history small multiples per currency: Total Net % OI with ±2SD bands. |
+| `history_positioning.png` | Full-history small multiples per currency: y-axis = full-history percentile of Total Net % OI (0–100), with 90th/10th range-end bands and the 50th-percentile median. |
 | `Positioning_Data.xlsx` | Formatted table + both charts embedded. |
 
 The CFTC API response is cached locally (`~/.fx_cache/`) for 24h, so repeated
@@ -141,8 +141,9 @@ requirements.txt          Python dependencies
   window (extension).
 - **Lookback windows:** 13W ≈ tactical/recent · 52W ≈ cyclical (1Y) · 5Y ≈
   structural/multi-year (260 reports) · plus full-history `Hist Z` / `Hist Pctl`
-  (the basis for the chart's ±2SD bands and any all-time-extreme read). The
-  windows can diverge — a position can be at its 13W floor yet near its 5Y high.
+  (`Hist Pctl` is the history chart's y-axis; `Hist Z` is the all-time-extreme
+  read). The windows can diverge — a position can be at its 13W floor yet near
+  its 5Y high.
 
 ## Disclaimer
 

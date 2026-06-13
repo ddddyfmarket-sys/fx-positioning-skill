@@ -20,7 +20,7 @@ API response is cached locally for 24 hours so repeated runs don't hit the API.
 Outputs (written to --outdir, default = current working directory):
     Positioning_Data.xlsx   formatted table + both charts embedded
     ytd_positioning.png      standalone YTD distribution box plot
-    history_positioning.png  standalone full-history small-multiples chart
+    history_positioning.png  full-history small-multiples, y-axis = full-history percentile
     positioning_table.csv    machine-readable table incl. Lev / AstMgr split
 
 Usage:
@@ -70,7 +70,7 @@ FETCH_LIMIT = 50000   # max rows per request; full FX dataset is ~11k rows
 
 CCY_ORDER = ["EUR", "JPY", "GBP", "CHF", "CAD", "AUD", "NZD", "MXN", "BRL", "ZAR", "DXY"]
 
-# Per-currency chart display start date (±2SD still computed over full history)
+# Per-currency chart display start date (percentile still computed over full history)
 CHART_STARTS = {
     "ZAR": date(2016, 1, 1),   # pre-2016 ZAR data is very sparse (<5 obs/year)
 }
@@ -499,7 +499,7 @@ def _make_ytd_chart(fx_rows: list[dict], fx_data: dict):
     return buf
 
 
-# ── Full-history time-series chart with ±2 SD ────────────────────────────────
+# ── Full-history time-series chart on a full-history percentile y-axis ────────
 
 def _make_history_chart(fx_data: dict):
     try:
@@ -518,7 +518,8 @@ def _make_history_chart(fx_data: dict):
                              figsize=(ncols * 5.5, nrows * 3.0 + 0.8),
                              squeeze=False)
     fig.suptitle(
-        "FX Positioning — Full History  (Total Net % OI: Leveraged Funds + Asset Managers)",
+        "FX Positioning — Full History  (full-history percentile of Total Net % OI: "
+        "Leveraged Funds + Asset Managers)",
         fontsize=11, fontweight="bold", color="#1F3864", y=0.99,
     )
 
@@ -536,45 +537,51 @@ def _make_history_chart(fx_data: dict):
         dates  = [h["date"] for h in history]
         values = [h["total_net_pct"] for h in history]
 
-        # ±2SD computed over full history regardless of display window
-        mean  = sum(values) / len(values)
-        stdev = (sum((v - mean) ** 2 for v in values) / (len(values) - 1)) ** 0.5
-        sd2p, sd2n = mean + 2 * stdev, mean - 2 * stdev
+        # Y-axis = full-history percentile (0–100) of each observation vs the
+        # whole series. 50 = the currency's own median position; 90/10 mark the
+        # long/short ends of its full-history range. Percentile is computed over
+        # the full series regardless of the display window, so it matches the
+        # Hist Pctl column in the table.
+        pcts = [pctl_rank(v, values) for v in values]
 
         # Clip display window for sparse-early-data currencies
         chart_start  = CHART_STARTS.get(ccy, dates[0])
-        disp_dates   = [d for d, v in zip(dates, values) if d >= chart_start]
-        disp_values  = [v for d, v in zip(dates, values) if d >= chart_start]
+        disp_dates   = [d for d, p in zip(dates, pcts) if d >= chart_start]
+        disp_pcts    = [p for d, p in zip(dates, pcts) if d >= chart_start]
         if len(disp_dates) < 2:
-            disp_dates, disp_values = dates, values
+            disp_dates, disp_pcts = dates, pcts
 
-        ax.plot(disp_dates, disp_values, color="#2F5496", linewidth=1.0, zorder=3)
-        ax.fill_between(disp_dates, disp_values, 0,
-                        where=[v >= 0 for v in disp_values],
+        ax.plot(disp_dates, disp_pcts, color="#2F5496", linewidth=1.0, zorder=3)
+        # Shade vs the median (50th pctl): above = longer than its own history,
+        # below = shorter.
+        ax.fill_between(disp_dates, disp_pcts, 50,
+                        where=[p >= 50 for p in disp_pcts],
                         alpha=0.18, color="#276221", interpolate=True, zorder=2)
-        ax.fill_between(disp_dates, disp_values, 0,
-                        where=[v < 0 for v in disp_values],
+        ax.fill_between(disp_dates, disp_pcts, 50,
+                        where=[p < 50 for p in disp_pcts],
                         alpha=0.18, color="#9C0006", interpolate=True, zorder=2)
 
-        ax.axhline(sd2p, color="#276221", linewidth=0.9, linestyle="--", alpha=0.75)
-        ax.axhline(sd2n, color="#9C0006",  linewidth=0.9, linestyle="--", alpha=0.75)
-        ax.axhline(mean, color="#888888",  linewidth=0.7, linestyle=":",  alpha=0.6)
-        ax.axhline(0, color="#444444", linewidth=0.8, zorder=4)
+        # Range-extreme bands at the 90th / 10th percentile (long / short ends).
+        ax.axhline(90, color="#276221", linewidth=0.9, linestyle="--", alpha=0.75)
+        ax.axhline(10, color="#9C0006",  linewidth=0.9, linestyle="--", alpha=0.75)
+        ax.axhline(50, color="#888888",  linewidth=0.7, linestyle=":",  alpha=0.6)
 
-        # Annotate SD lines on the right edge
+        # Annotate band lines on the right edge
         xmax = disp_dates[-1]
-        ax.annotate("+2SD", xy=(xmax, sd2p), fontsize=5.5, color="#276221",
+        ax.annotate("90th", xy=(xmax, 90), fontsize=5.5, color="#276221",
                     va="center", ha="left", xytext=(3, 0), textcoords="offset points")
-        ax.annotate("−2SD", xy=(xmax, sd2n), fontsize=5.5, color="#9C0006",
+        ax.annotate("10th", xy=(xmax, 10), fontsize=5.5, color="#9C0006",
                     va="center", ha="left", xytext=(3, 0), textcoords="offset points")
 
         ax.set_xlim(disp_dates[0], date.today())
+        ax.set_ylim(0, 100)
         ax.set_title(ccy, fontsize=9, fontweight="bold", color="#1F3864")
         ax.tick_params(axis="both", labelsize=6.5, colors="#444444")
         ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
         ax.xaxis.set_major_locator(mdates.YearLocator(2))
         ax.tick_params(axis="x", rotation=45)
-        ax.set_ylabel("Net % OI", fontsize=6, color="#444444")
+        ax.set_yticks([0, 25, 50, 75, 100])
+        ax.set_ylabel("Hist Pctl", fontsize=6, color="#444444")
         ax.grid(axis="y", linestyle="--", color="#CCCCCC", alpha=0.45)
         for sp in ("top", "right"):
             ax.spines[sp].set_visible(False)
@@ -583,7 +590,8 @@ def _make_history_chart(fx_data: dict):
         axes[idx // ncols][idx % ncols].axis("off")
 
     fig.text(0.99, 0.005,
-             "Source: CFTC TFF Combined — (Leveraged Funds + Asset Managers) Net % of Open Interest.",
+             "Source: CFTC TFF Combined — full-history percentile of (Leveraged Funds + "
+             "Asset Managers) Net % of Open Interest. 50th = median; 90th/10th = range ends.",
              fontsize=6, color="#999999", ha="right")
     fig.tight_layout(rect=[0, 0.015, 1, 0.97])
 
@@ -701,9 +709,10 @@ def write_table_csv(fx_rows: list[dict], cot_date, outdir: Path) -> None:
                     f"Net = (Leveraged Funds + Asset Managers) long − short as % of "
                     f"Open Interest. 13W/52W/5Y Pctl & Z are vs trailing 13-week, 52-week "
                     f"and 5-year (260-report) windows — horizons from tactical to "
-                    f"structural. Hist Z / Hist Pctl are vs FULL history (2006→) — the "
-                    f"basis for the history chart's ±2SD bands and any 'historic extreme' "
-                    f"read. Windows can diverge sharply; cite the one you mean."])
+                    f"structural. Hist Z / Hist Pctl are vs FULL history (2006→) — Hist "
+                    f"Pctl is the y-axis of the history chart (90th/10th = range ends) and "
+                    f"the basis for any 'historic extreme' read. Windows can diverge "
+                    f"sharply; cite the one you mean."])
         w.writerow(cols)
         for r in fx_rows:
             w.writerow([r.get(c, "") for c in cols])

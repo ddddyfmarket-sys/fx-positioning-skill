@@ -92,8 +92,8 @@ Keep the whole thing to roughly one page. Density over length.
   (how crowded/extended). Z-score = how many SD from the mean. A high
   percentile with a modest z is range-bound-high; a high z is a genuine outlier.
 - **Three horizons — name the one you mean.** 13W = tactical/recent, 52W =
-  cyclical (1Y), 5Y = structural/multi-year; plus Hist (full history) for the
-  ±2SD bands. The windows nest, and when they disagree *that is the signal*: a
+  cyclical (1Y), 5Y = structural/multi-year; plus Hist (full history), the
+  history chart's percentile y-axis. The windows nest, and when they disagree *that is the signal*: a
   position can be at its 13W floor yet near its 5Y high (being cut but still
   structurally large), or fresh on the year but neutral over 5Y. Spell the
   divergence out descriptively — it's the difference between a tactical wobble
@@ -120,16 +120,19 @@ Keep the whole thing to roughly one page. Density over length.
   - Mirror case (stretched despite the sign): *"CHF is net short (−34% OI) yet
     sits at the top of its range (98th %ile) — a heavily-covered short,
     stretched toward the long end despite the negative net."*
-- **±2SD bands = full history (use `Hist Z`, not the 52W stat).** The history
-  chart's ±2SD envelope is computed over the **full** series (2006→), so the
-  correct "genuine extreme vs merely elevated" read is the `Hist Z` / `Hist
-  Pctl` columns — *not* the 52W/13W percentile, and not an eyeball of the small
-  subplots. The two windows can diverge hard: a book can sit at the top of its
-  trailing year (52W 98th %ile) yet be below its long-run mean (Hist Z −0.9,
-  19th %ile) — the recent picture is "shorts covered to a 1-yr high," the
-  full-history picture is "still net short, mid-low range." Say which window you
-  mean, and only call a ±2SD / multi-year extreme when `Hist Z` supports it
-  (|Hist Z| ≳ 2). Never attribute a 52W extreme to the history chart.
+- **History chart = full-history percentile (use `Hist Pctl` / `Hist Z`, not the
+  52W stat).** The history chart's y-axis is the **full-history percentile**
+  (2006→) of Total Net % OI, with the 50th-percentile median dotted and the
+  90th/10th range-ends dashed, so the correct "where in its full range" read is
+  the `Hist Pctl` column — *not* the 52W/13W percentile — and the chart endpoint
+  equals `Hist Pctl`. For "genuine outlier vs merely elevated," lean on `Hist Z`
+  (|Hist Z| ≳ 2 is a true extreme; the 90th/10th bands flag range ends, a softer
+  bar). The windows can diverge hard: a book can sit at the top of its trailing
+  year (52W 98th %ile) yet below its long-run mean (Hist Z −0.9, 19th %ile, below
+  the chart's median line) — the recent picture is "shorts covered to a 1-yr
+  high," the full-history picture is "still net short, mid-low range." Say which
+  window you mean. Never attribute a 52W extreme to the history chart — that
+  chart is full-history percentile only.
 
 ## Punch, and no repetition
 

@@ -58,7 +58,7 @@ The script writes four files to the output directory:
 |---|---|
 | `positioning_table.csv` | The table incl. the Leveraged-Funds vs Asset-Manager split. **Source of truth for all numbers you cite.** |
 | `ytd_positioning.png` | YTD distribution box plot: each currency's YTD range of 52W z-scores, with current (×) and 1-week-ago (•) marked. |
-| `history_positioning.png` | Full-history small multiples per currency, Total Net % OI with ±2SD bands. |
+| `history_positioning.png` | Full-history small multiples per currency, y-axis = full-history percentile of Total Net % OI (0–100), with 90th/10th range-end bands and the 50th-percentile median. |
 | `Positioning_Data.xlsx` | Formatted table + both charts embedded — the deliverable workbook for the PM. |
 
 ### 2. Read the outputs
@@ -71,10 +71,14 @@ Read all three analytical outputs before writing a word:
    its own year's range, and whether it moved toward or away from an extreme
    in the last week (× vs •).
 3. `history_positioning.png` — for the long-run *shape*: the trajectory, regime
-   shifts, how the current move compares to past swings. For the precise "is it
-   at a ±2SD extreme" question, **trust `Hist Z` in the table, not your eye** —
-   the subplots are small and the bands are full-history (|Hist Z| ≳ 2 ≈ at the
-   band). Use the chart for context; use the number for the claim.
+   shifts, how the current move compares to past swings. The y-axis is now the
+   **full-history percentile** of Total Net % OI (0–100), so the line's level
+   reads directly as `Hist Pctl`: 50 = the currency's own median, the 90th/10th
+   bands mark the long/short ends of its range, and the fill is green above the
+   median, red below. The current endpoint equals the `Hist Pctl` column. For a
+   genuine multi-year *extreme* read, still cross-check `Hist Z` in the table
+   (|Hist Z| ≳ 2 is a true outlier); the 90th/10th bands flag range ends, which
+   is a softer bar than ±2SD.
 
 If the script reports a currency skipped for insufficient history, say so
 rather than inventing a read.
@@ -109,16 +113,17 @@ as a horizon ladder, and always name which one you mean:
   *is* the story — a regime shift or a position rebuilding/unwinding — so spell
   it out.
 - **Hist Z / Hist Pctl** — the position vs its **full history** (2006→). This,
-  *not* the 13W/52W/5Y windowed stat, is what the history chart's ±2SD bands
-  reflect, and the only correct basis for any "historic extreme / pressing its
-  ±2SD band / multi-year high-low" claim. **Use the right window:** 13W/52W/5Y =
-  *windowed* crowding; Hist = *all-time* extreme. They can diverge sharply —
-  never map one onto the other, and never eyeball an extreme off the small chart
-  subplots when the number is right here in the table. (Worked example: CHF reads 98th %ile /
-  +1.8z on 52W — top of the *past year*, shorts covered — but only 19th %ile /
-  −0.9 Hist Z, i.e. *below* its long-run mean and still net short. So it is
-  **not** near its upper ±2SD band; the history chart shows it in the lower,
-  net-short region. Claiming it "presses the upper band" would be wrong.)
+  *not* the 13W/52W/5Y windowed stat, is what the history chart plots on its
+  y-axis (`Hist Pctl`) and the only correct basis for any "historic extreme /
+  multi-year high-low" claim. **Use the right window:** 13W/52W/5Y = *windowed*
+  crowding; Hist = *all-time* range position. They can diverge sharply — never
+  map one onto the other. The history chart now shows `Hist Pctl` directly, so
+  the line's level is trustworthy; use `Hist Z` for whether a level is a true
+  *outlier* (|Hist Z| ≳ 2). (Worked example: CHF reads 98th %ile / +1.8z on 52W
+  — top of the *past year*, shorts covered — but only 19th %ile / −0.9 Hist Z,
+  i.e. *below* its long-run mean and still net short. On the history chart it
+  sits in the lower, red, below-median band — well short of the 90th-percentile
+  long-end line. Claiming it "presses the top of its range" would be wrong.)
 - **WoW Chg / MoM Chg** — change in Total Net % OI vs last week / ~4 weeks ago.
   The *flow*. Describe the biggest movers and the direction of flow.
 
@@ -146,8 +151,8 @@ the directional conclusion. See `references/writing_style.md`.
 
 Read `references/writing_style.md` now — it carries the house voice,
 structure, vocabulary, and the analytical angles (aggregate-vs-dispersion,
-lev-vs-asset-manager split, percentile-vs-z, WoW flow, level-vs-range, ±2SD
-extremes). Follow it.
+lev-vs-asset-manager split, percentile-vs-z, WoW flow, level-vs-range,
+full-history range position). Follow it.
 
 Write the note as a markdown file in the output directory
 (`fx_positioning_note_<COT-date>.md`) **and** present it in the chat. Use this
