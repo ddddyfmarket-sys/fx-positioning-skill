@@ -11,8 +11,8 @@ Lead with the signal and quantify it.
 This is a **description of where the market is positioned**, not a trade
 recommendation. The job is to tell the PM, precisely and quantitatively:
 who is long/short what, how crowded or extended that is vs history, how it
-changed this week/month, and how the leveraged-fund and asset-manager cohorts
-are positioned. The PM supplies the trade view; the note supplies the
+changed this week/month, and how the leveraged-fund and asset-manager cohorts 
+are positioned. The PM supplies the trade view; the note supplies the 
 positioning picture they reason from.
 
 **Do not tell the PM what to trade.** No "fade," "buy," "sell," "we'd be long
@@ -29,40 +29,11 @@ how it changed, which cohort holds it — and let the PM draw the directional
 conclusion.
 
 **Strictly data-only.** Confine the note to what is in `positioning_table.csv`
-and the two charts. **No external macro, carry, rate-differential, central-bank
-or event references, and no `[PM: …]` placeholders.** Don't speculate on *why*
-a position is where it is or whether it's justified — that's the PM's domain.
-Report the positioning; stop there. (If the PM gives you macro context in the
-prompt, you may use it — but never invent it.)
-
-## Structure of the note
-
-1. **Headline** — one line, the single most important descriptive takeaway.
-   E.g. *"USD positioning still neutral in aggregate; CHF length at the top of
-   its range."* Descriptive, not a call.
-
-2. **Key Takeaways** — 4–6 tight bullets. Each is a *claim with a number*,
-   not a vague observation, and not a trade. Lead with the currency/theme,
-   state the positioning read, cite the metric in parentheses.
-   - Good: *"CHF spec positioning sits at the top of its range — 98th %ile and
-     +1.8z on the year — and was added to again this week (WoW +2.8% OI)."*
-   - Weak (vague): *"CHF positioning increased this week."*
-   - Wrong (a trade call): *"CHF looks crowded — fade the long."*
-
-3. **Body**, organized by theme (not a currency-by-currency march):
-   - **Aggregate / USD** — what the DXY line and the broad G10 picture say. Is
-     the market broadly long or short USD? Is the aggregate neutral while
-     *dispersion* is high? Name the regime.
-   - **G10 divergences** — where G10 is offside. Who sits long, who short, who
-     just flipped, who's at a range extreme. Call out the asset-manager vs
-     leveraged-fund split where they disagree (see below).
-   - **EM** — MXN, BRL, ZAR. Note levels, range position, the cohort split, and
-     any sharp WoW build/unwind.
-   - **At a glance** — a compact scoreboard, not prose. Which positions sit at
-     range extremes, which moved most this week, where the leveraged-fund /
-     asset-manager cohorts diverge. Terse tags, no re-narration, no trade calls.
-
-Keep the whole thing to roughly one page. Density over length.
+and the three charts. **No external macro events/stories, carry, rate-differential, central-bank,
+self-explanation such as broad de-risk/risk-on, or structural/cyclical, and no `[PM: …]` 
+placeholders.** Don't speculate on *why* a position is where it is or whether it's justified — that's the PM's domain. 
+Report the positioning; Describe but NOT explain; stop there. 
+(If the PM gives you macro context in the prompt, you may use it — but never invent it.)
 
 ## Vocabulary (use it, don't overdo it)
 
@@ -93,17 +64,18 @@ Keep the whole thing to roughly one page. Density over length.
   percentile with a modest z is range-bound-high; a high z is a genuine outlier.
 - **Three horizons — name the one you mean.** 13W = tactical/recent, 52W =
   cyclical (1Y), 5Y = structural/multi-year; plus Hist (full history), the
-  history chart's percentile y-axis. The windows nest, and when they disagree *that is the signal*: a
-  position can be at its 13W floor yet near its 5Y high (being cut but still
+  history chart's percentile y-axis. The windows nest, and when they disagree *that is the signal*: a position can be at its 13W floor yet near its 5Y high (being cut but still
   structurally large), or fresh on the year but neutral over 5Y. Spell the
   divergence out descriptively — it's the difference between a tactical wobble
   and a structural shift. Don't quote all three windows for every currency;
   lead with the one that carries the point and bring in another only when they
   diverge.
-- **WoW / MoM flow.** The *change* often matters as much as the level. A large
+- **WoW/MoM flow.** The *change* often matters as much as the level. A large
   WoW move into a position vs out of one is worth flagging. Describe the
   biggest movers and the direction of flow — don't editorialise it into a
-  signal.
+  signal. If there is meaningful directional nuance for WoW vs MoM flow (
+  strong MoM and WoW add/drop further or huge WoW reverse MoM direction)
+  
 - **Level *and* stretchedness — always together.** These are two different
   facts and both matter. The **absolute net** (% OI) gives the *size and
   direction* of a position; the **percentile / z-score** gives how *stretched*
@@ -134,18 +106,33 @@ Keep the whole thing to roughly one page. Density over length.
   window you mean. Never attribute a 52W extreme to the history chart — that
   chart is full-history percentile only.
 
-## Punch, and no repetition
+### Punch and no repetition
 
-A desk note is dense and fast to read. Every line earns its place.
+This is a desk note — make every line earn its place.
 
-- **Punchy.** Short, declarative sentences, currency and number first. Cut
-  hedges and throat-clearing ("it is worth noting…", "interestingly…",
-  "as mentioned…"). One idea per sentence.
-- **No repetition.** Key Takeaways summarise, so they preview the body — fine.
-  But body sections must not restate each other, and the closing scoreboard
-  must be terse tags, not prose re-narrating what's above. Say each number
-  once, in its most relevant home (takeaway + one body mention is plenty).
+- **Punchy.** Short, declarative sentences. Lead with the currency and the
+  number. Cut hedges, filler, and throat-clearing ("it is worth noting that…",
+  "interestingly…"). One idea per sentence.
+- **No repetition across sections.** The Key Takeaways are a summary, so they
+  necessarily preview the body — that's fine. But the body sections must not
+  restate each other, and the closing "At a glance" must be a *scoreboard*
+  (terse, scannable), not a paragraph re-narrating G10/EM. If a fact is in the
+  body, don't say it again in full prose at the end — reduce it to a tag.
+- **Say each number once, in its most relevant home.** Don't quote CHF's
+  98th %ile in the takeaway, again in G10, again in the closing section as a
+  sentence. Take + one body mention is enough.
+
+### 5. Strictly data-only — no macro, no placeholders
+
+Confine the note to what is in `positioning_table.csv` and the two charts.
+**Do not** add external macro, carry, rate-differential, central-bank or event
+references, and **do not** insert `[PM: …]` placeholders. Don't speculate on
+*why* a position sits where it does or whether it's justified — that's the
+PM's domain. Report the positioning state and stop there. Analyse positioning
+vs USD as the data is computed. (If the user supplies macro context in the
+prompt, you may use it — but never invent it.)
 
 ## Tone
 
-Crisp, declarative, numerate, descriptive. This is a positioning monitor, not a strategy piece: report the state of the market clearly and let the PM act on it.
+Crisp, declarative, numerate, descriptive, professional. This is a positioning monitor, not a strategy piece: 
+report the state of the market clearly and let the PM explain and act on it.
