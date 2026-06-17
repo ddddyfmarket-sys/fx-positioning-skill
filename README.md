@@ -12,8 +12,7 @@ When invoked, it:
    CFTC Socrata API for 11 markets — **EUR, JPY, GBP, CHF, CAD, AUD, NZD, MXN,
    BRL, ZAR, DXY** — and computes **Leveraged-Funds + Asset-Manager net
    positioning as a % of open interest**, with 13-week, 52-week and 3-year
-   percentiles and z-scores (tactical → cyclical → structural), full-history
-   z-scores, and week-over-week and month-over-month changes.
+   percentiles and z-scores (tactical → cyclical → structural), and WoW & MoM changes.
 2. Produces a formatted Excel workbook, three charts (a YTD positioning-score
    distribution, a full-history time series on a **rolling 3-year percentile**
    y-axis, and a supplementary level-vs-momentum scatter), and a
