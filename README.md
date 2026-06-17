@@ -11,11 +11,11 @@ When invoked, it:
    (Traders in Financial Futures), Futures+Options Combined** data from the
    CFTC Socrata API for 11 markets — **EUR, JPY, GBP, CHF, CAD, AUD, NZD, MXN,
    BRL, ZAR, DXY** — and computes **Leveraged-Funds + Asset-Manager net
-   positioning as a % of open interest**, with 13-week, 52-week and 5-year
+   positioning as a % of open interest**, with 13-week, 52-week and 3-year
    percentiles and z-scores (tactical → cyclical → structural), full-history
    z-scores, and week-over-week and month-over-month changes.
 2. Produces a formatted Excel workbook, three charts (a YTD positioning-score
-   distribution, a full-history time series on a full-history percentile
+   distribution, a full-history time series on a **rolling 3-year percentile**
    y-axis, and a supplementary level-vs-momentum scatter), and a
    machine-readable CSV.
 3. Has the agent read the table and **view the charts**, then write a one-page
@@ -36,7 +36,7 @@ crowding highlights (green = crowded long, red = crowded short):
 
 The charts the analysis reads (also embedded in the workbook):
 
-| YTD positioning-score distribution | Full-history percentile of net positioning |
+| YTD positioning-score distribution | Rolling 3Y percentile of net positioning |
 |---|---|
 | ![YTD](examples/ytd_positioning.png) | ![History](examples/history_positioning.png) |
 
@@ -123,7 +123,7 @@ python3 "$SKILL_DIR/scripts/fx_positioning.py" --refresh  # bypass 24h cache
 |---|---|
 | `positioning_table.csv` | The table incl. the Leveraged-Funds vs Asset-Manager split — the source of truth for every number in the note. |
 | `ytd_positioning.png` | YTD distribution of each currency's 52W positioning score, with current (×) and 1-week-ago (•) marked. |
-| `history_positioning.png` | Full-history small multiples per currency: y-axis = full-history percentile of Total Net % OI (0–100), with 90th/10th range-end bands and the 50th-percentile median. |
+| `history_positioning.png` | Full-history small multiples per currency: y-axis = **rolling 3Y (trailing 156-report) percentile** of Total Net % OI (0–100), with 90th/10th range-end bands and the 50th-percentile median — how stretched each point was vs its prior 3 years. |
 | `momentum_positioning.png` | Supplementary level-vs-momentum scatter: y = current 52W z-score, x = 1-month change in that z-score, one dot per currency; quadrants = long/short × adding/paring. |
 | `Positioning_Data.xlsx` | Formatted table + all three charts embedded. |
 
@@ -148,11 +148,13 @@ requirements.txt          Python dependencies
   window (crowding / range position).
 - **Z-score** = standard deviations of the latest reading from the mean of that
   window (extension).
-- **Lookback windows:** 13W ≈ tactical/recent · 52W ≈ cyclical (1Y) · 5Y ≈
-  structural/multi-year (260 reports) · plus full-history `Hist Z` / `Hist Pctl`
-  (`Hist Pctl` is the history chart's y-axis; `Hist Z` is the all-time-extreme
-  read). The windows can diverge — a position can be at its 13W floor yet near
-  its 5Y high.
+- **Lookback windows:** 13W ≈ tactical/recent · 52W ≈ cyclical (1Y) · 3Y ≈
+  structural/multi-year (156 reports) · plus full-history `Hist Z` / `Hist Pctl`
+  (full sample, the all-time-extreme read). The history chart's y-axis is the
+  **rolling 3Y percentile**, so its endpoint equals the `3Y Pctl` column — a
+  point-in-time read of how stretched positioning is vs its own recent 3 years.
+  The windows can diverge — a position can be at its 13W floor yet near its 3Y
+  high.
 
 ## Disclaimer
 

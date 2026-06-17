@@ -12,7 +12,7 @@ Methodology
     Percentile >= 90 in any window → green cell  (crowded LONG)
     Percentile <= 10 in any window → red cell    (crowded SHORT)
     Negative numbers shown in red font.
-    (Lookback windows: 13W ~3M tactical, 52W ~1Y cyclical, 5Y ~260-report
+    (Lookback windows: 13W ~3M tactical, 52W ~1Y cyclical, 3Y ~156-report
      structural; plus full-history reads in the CSV.)
 
 API response is cached locally for 24 hours so repeated runs don't hit the API.
@@ -20,7 +20,7 @@ API response is cached locally for 24 hours so repeated runs don't hit the API.
 Outputs (written to --outdir, default = current working directory):
     Positioning_Data.xlsx    formatted table + all three charts embedded
     ytd_positioning.png      standalone YTD distribution box plot
-    history_positioning.png  full-history small-multiples, y-axis = full-history percentile
+    history_positioning.png  full-history small-multiples, y-axis = rolling 3Y percentile
     momentum_positioning.png level (52W Z) vs 1M change in 52W Z scatter, one dot per ccy
     positioning_table.csv    machine-readable table incl. Lev / AstMgr split
 
@@ -47,7 +47,7 @@ from openpyxl.utils import get_column_letter
 EXCEL_NAME     = "Positioning_Data.xlsx"
 SHEET_NAME     = "FX Positioning"
 DATA_START_ROW = 6
-N_COLS         = 13
+N_COLS         = 17
 
 
 def resolve_outdir() -> Path:
@@ -71,7 +71,8 @@ FETCH_LIMIT = 50000   # max rows per request; full FX dataset is ~11k rows
 
 CCY_ORDER = ["EUR", "JPY", "GBP", "CHF", "CAD", "AUD", "NZD", "MXN", "BRL", "ZAR", "DXY"]
 
-# Per-currency chart display start date (percentile still computed over full history)
+# Per-currency chart display start date (rolling 3Y percentile still computed over the
+# full underlying series; only the displayed date window is clipped)
 CHART_STARTS = {
     "ZAR": date(2016, 1, 1),   # pre-2016 ZAR data is very sparse (<5 obs/year)
 }
@@ -250,23 +251,30 @@ def compute_row(ccy: str, ccy_data: dict) -> dict | None:
     prev   = ccy_data["prev"]
 
     # Lookback windows of the Total Net % OI series (most recent N reports),
-    # ordered by horizon: 13W ≈ 3M (tactical), 52W ≈ 1Y (cyclical), 5Y ≈ 260
+    # ordered by horizon: 13W ≈ 3M (tactical), 52W ≈ 1Y (cyclical), 3Y ≈ 156
     # weekly reports (structural/multi-year). The 13-week window is the shortest
     # that keeps the percentile/Z reasonably meaningful (a 4-week window was too
     # thin). Where a currency has fewer than a window's worth of reports, the
     # slice simply uses all available — pctl_rank / z_score guard small n.
     hist_13w  = [r["total_net_pct"] for r in history[-13:]]
     hist_52w  = [r["total_net_pct"] for r in history[-52:]]
-    hist_5y   = [r["total_net_pct"] for r in history[-260:]]
-    hist_full = [r["total_net_pct"] for r in history]   # full history (2006→); this
-    #                                                     is the baseline the ±2SD
-    #                                                     bands on the history chart
-    #                                                     use — NOT a fixed window.
+    hist_3y   = [r["total_net_pct"] for r in history[-156:]]
+    hist_full = [r["total_net_pct"] for r in history]   # full history (2006→); the
+    #                                                     basis for the Hist Z / Hist
+    #                                                     Pctl full-sample reads in the
+    #                                                     CSV — NOT a fixed window.
 
     cur   = latest["total_net_pct"]
     wow   = cur - prev["total_net_pct"]                 # vs last week (history[-2])
+    # Per-group week-over-week change, so the Lev / AstMgr legs of the WoW move
+    # can be read alongside the aggregate (they need not move the same way).
+    lev_wow = latest["lev_net_pct"] - prev["lev_net_pct"]
+    am_wow  = latest["am_net_pct"]  - prev["am_net_pct"]
     # Month-over-month ≈ change vs 4 reports ago (history[-5] = current minus 4 weeks).
-    mom   = round(cur - history[-5]["total_net_pct"], 2) if len(history) >= 5 else None
+    has_mom = len(history) >= 5
+    mom     = round(cur - history[-5]["total_net_pct"], 2) if has_mom else None
+    lev_mom = round(latest["lev_net_pct"] - history[-5]["lev_net_pct"], 2) if has_mom else None
+    am_mom  = round(latest["am_net_pct"]  - history[-5]["am_net_pct"],  2) if has_mom else None
     p52_r = round(pctl_rank(cur, hist_52w), 1)
 
     return {
@@ -275,17 +283,24 @@ def compute_row(ccy: str, ccy_data: dict) -> dict | None:
         "13W Z":      round(z_score(cur, hist_13w), 2),
         "52W Pctl":   p52_r,
         "52W Z":      round(z_score(cur, hist_52w), 2),
-        "5Y Pctl":    round(pctl_rank(cur, hist_5y), 1),
-        "5Y Z":       round(z_score(cur, hist_5y), 2),
-        # Full-history reads — the correct basis for any "±2SD band / historic
-        # extreme" statement (the history chart's bands are full-history). These
-        # can diverge sharply from the 52W reads: a position can sit at the top
-        # of its trailing year (52W Pctl ~98) yet be mid- or low-range on full
-        # history (Hist Pctl ~20) — e.g. a heavily-covered but still-net-short book.
+        "3Y Pctl":    round(pctl_rank(cur, hist_3y), 1),
+        "3Y Z":       round(z_score(cur, hist_3y), 2),
+        # Full-history reads (full sample, 2006→) — the correct basis for any
+        # "historic extreme" statement. These can diverge sharply from the 52W
+        # reads: a position can sit at the top of its trailing year (52W Pctl ~98)
+        # yet be mid- or low-range on full history (Hist Pctl ~20) — e.g. a
+        # heavily-covered but still-net-short book. (The history chart's y-axis is
+        # the rolling 3Y percentile, a separate point-in-time measure.)
         "Hist Z":     round(z_score(cur, hist_full), 2),
         "Hist Pctl":  round(pctl_rank(cur, hist_full), 1),
+        # WoW Δ and MoM Δ split by trader group (Total = Lev + AstMgr), so each
+        # change group mirrors the NET POSITION group's Total/Lev/AstMgr layout.
         "WoW Chg":    round(wow, 2),
+        "WoW Lev":    round(lev_wow, 2),
+        "WoW AstMgr": round(am_wow, 2),
         "MoM Chg":    mom,
+        "MoM Lev":    lev_mom,
+        "MoM AstMgr": am_mom,
         "Total Net":  round(cur, 2),
         "LevFd Net":  round(latest["lev_net_pct"], 2),
         "AstMgr Net": round(latest["am_net_pct"], 2),
@@ -313,16 +328,19 @@ _THIN     = Side(style="thin", color="D9D9D9")
 _BORDER   = Border(left=_THIN, right=_THIN, top=_THIN, bottom=_THIN)
 _ALT_FILL = PatternFill("solid", fgColor="F5F8FD")
 
-# Col:  1=CCY  2=13W Pctl  3=13W Z  4=52W Pctl  5=52W Z  6=5Y Pctl  7=5Y Z
-#       8=WoW  9=MoM  10=Total Net  11=Lev  12=AstMgr  13=OI
+# Col:  1=CCY  2=13W Pctl  3=13W Z  4=52W Pctl  5=52W Z  6=3Y Pctl  7=3Y Z
+#       8=WoW Total   9=WoW Lev   10=WoW AstMgr
+#       11=MoM Total  12=MoM Lev  13=MoM AstMgr
+#       14=Total Net  15=Lev  16=AstMgr  17=OI
 _NUMFMT = {
     2: "0.0", 3: "0.00", 4: "0.0", 5: "0.00", 6: "0.0", 7: "0.00",
-    8: "+0.00;-0.00", 9: "+0.00;-0.00",
-    10: "0.00", 11: "0.00", 12: "0.00", 13: "#,##0",
+    8: "+0.00;-0.00",  9: "+0.00;-0.00", 10: "+0.00;-0.00",
+    11: "+0.00;-0.00", 12: "+0.00;-0.00", 13: "+0.00;-0.00",
+    14: "0.00", 15: "0.00", 16: "0.00", 17: "#,##0",
 }
-_COL_WIDTHS = [10, 7, 7.5, 7, 7.5, 7, 7.5, 8, 8, 8, 8, 8.5, 11]
-_PCTL_COLS  = {2, 4, 6}                    # 13W / 52W / 5Y percentile columns
-_NEG_COLS   = {3, 5, 7, 8, 9, 10, 11, 12}  # Z, change & net columns (red if < 0)
+_COL_WIDTHS = [10, 7, 7.5, 7, 7.5, 7, 7.5, 8, 8, 8, 8, 8, 8, 8, 8, 8.5, 11]
+_PCTL_COLS  = {2, 4, 6}                              # 13W / 52W / 3Y percentile columns
+_NEG_COLS   = {3, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16}  # Z, change & net cols (red if < 0)
 
 
 def _safe_merge(ws, r1, c1, r2, c2):
@@ -342,10 +360,11 @@ def _write_headers(ws) -> None:
         (1,  1,  None),
         (2,  3,  "13W (% OI)"),
         (4,  5,  "52W (% OI)"),
-        (6,  7,  "5Y (% OI)"),
-        (8,  9,  "CHANGES (% OI)"),
-        (10, 12, "NET POSITION (% OI)"),
-        (13, 13, None),
+        (6,  7,  "3Y (% OI)"),
+        (8,  10, "WoW Δ (% OI)"),
+        (11, 13, "MoM Δ (% OI)"),
+        (14, 16, "NET POSITION (% OI)"),
+        (17, 17, None),
     ]:
         if c1 < c2:
             _safe_merge(ws, 4, c1, 4, c2)
@@ -361,9 +380,10 @@ def _write_headers(ws) -> None:
         (2, "Pctl"), (3, "Z-Score"),
         (4, "Pctl"), (5, "Z-Score"),
         (6, "Pctl"), (7, "Z-Score"),
-        (8, "WoW"),  (9, "MoM"),
-        (10, "Total"), (11, "Lev"), (12, "AstMgr"),
-        (13, "OI"),
+        (8, "Total"),  (9, "Lev"),  (10, "AstMgr"),
+        (11, "Total"), (12, "Lev"), (13, "AstMgr"),
+        (14, "Total"), (15, "Lev"), (16, "AstMgr"),
+        (17, "OI"),
     ]:
         c = ws.cell(5, col)
         c.value, c.fill, c.font, c.alignment = label, _HDR_SUB_FILL, _HDR_SUB_FONT, _HDR_SUB_ALGN
@@ -376,8 +396,10 @@ def _write_headers(ws) -> None:
 def _write_data_row(ws, row_num: int, r: dict, zebra: bool) -> None:
     vals = [
         r["CCY"], r["13W Pctl"], r["13W Z"], r["52W Pctl"], r["52W Z"],
-        r["5Y Pctl"], r["5Y Z"],
-        r["WoW Chg"], r["MoM Chg"], r["Total Net"], r["LevFd Net"],  r["AstMgr Net"],
+        r["3Y Pctl"], r["3Y Z"],
+        r["WoW Chg"], r["WoW Lev"], r["WoW AstMgr"],
+        r["MoM Chg"], r["MoM Lev"], r["MoM AstMgr"],
+        r["Total Net"], r["LevFd Net"], r["AstMgr Net"],
         r["Open Int"],
     ]
     for col, val in enumerate(vals, start=1):
@@ -500,7 +522,7 @@ def _make_ytd_chart(fx_rows: list[dict], fx_data: dict):
     return buf
 
 
-# ── Full-history time-series chart on a full-history percentile y-axis ────────
+# ── Full-history time-series chart on a rolling-3Y percentile y-axis ──────────
 
 def _make_history_chart(fx_data: dict):
     try:
@@ -519,7 +541,7 @@ def _make_history_chart(fx_data: dict):
                              figsize=(ncols * 5.5, nrows * 3.0 + 0.8),
                              squeeze=False)
     fig.suptitle(
-        "FX Positioning — Full History  (full-history percentile of Total Net % OI: "
+        "FX Positioning — Full History  (rolling 3Y percentile of Total Net % OI: "
         "Leveraged Funds + Asset Managers)",
         fontsize=11, fontweight="bold", color="#1F3864", y=0.99,
     )
@@ -538,12 +560,16 @@ def _make_history_chart(fx_data: dict):
         dates  = [h["date"] for h in history]
         values = [h["total_net_pct"] for h in history]
 
-        # Y-axis = full-history percentile (0–100) of each observation vs the
-        # whole series. 50 = the currency's own median position; 90/10 mark the
-        # long/short ends of its full-history range. Percentile is computed over
-        # the full series regardless of the display window, so it matches the
-        # Hist Pctl column in the table.
-        pcts = [pctl_rank(v, values) for v in values]
+        # Y-axis = ROLLING 3-year percentile (0–100): each observation is ranked
+        # only against the trailing 156 reports (≈3Y) up to and including itself,
+        # so the line reads as how stretched positioning was AT THAT TIME vs its
+        # own recent-3Y range — not vs the full sample (which would use future
+        # data and flatten point-in-time extremes). 50 = the 3Y median; 90/10
+        # mark the long/short ends of the trailing-3Y range. Early points (before
+        # 156 reports exist) rank against all history available so far.
+        ROLL_3Y = 156
+        pcts = [pctl_rank(values[i], values[max(0, i - ROLL_3Y + 1): i + 1])
+                for i in range(len(values))]
 
         # Clip display window for sparse-early-data currencies
         chart_start  = CHART_STARTS.get(ccy, dates[0])
@@ -582,7 +608,7 @@ def _make_history_chart(fx_data: dict):
         ax.xaxis.set_major_locator(mdates.YearLocator(2))
         ax.tick_params(axis="x", rotation=45)
         ax.set_yticks([0, 25, 50, 75, 100])
-        ax.set_ylabel("Hist Pctl", fontsize=6, color="#444444")
+        ax.set_ylabel("3Y Pctl", fontsize=6, color="#444444")
         ax.grid(axis="y", linestyle="--", color="#CCCCCC", alpha=0.45)
         for sp in ("top", "right"):
             ax.spines[sp].set_visible(False)
@@ -591,8 +617,8 @@ def _make_history_chart(fx_data: dict):
         axes[idx // ncols][idx % ncols].axis("off")
 
     fig.text(0.99, 0.005,
-             "Source: CFTC TFF Combined — full-history percentile of (Leveraged Funds + "
-             "Asset Managers) Net % of Open Interest. 50th = median; 90th/10th = range ends.",
+             "Source: CFTC TFF Combined — rolling 3Y (156-report) percentile of (Leveraged Funds + "
+             "Asset Managers) Net % of Open Interest. 50th = 3Y median; 90th/10th = range ends.",
              fontsize=6, color="#999999", ha="right")
     fig.tight_layout(rect=[0, 0.015, 1, 0.97])
 
@@ -751,7 +777,7 @@ def write_excel(fx_rows: list[dict], fx_data: dict, cot_date, outdir: Path) -> N
     # Legend
     foot_row = DATA_START_ROW + len(CCY_ORDER) + 1
     for i, (text, bold) in enumerate([
-        ("POSITIONING HIGHLIGHTS  (percentile of Net % OI within each window: 13W / 52W / 5Y)", True),
+        ("POSITIONING HIGHLIGHTS  (percentile of Net % OI within each window: 13W / 52W / 3Y)", True),
         ("  Green cell: percentile ≥ 90th — at the long end of its range for that window", False),
         ("  Red cell:   percentile ≤ 10th — at the short end of its range for that window", False),
         ("NET = Leveraged Funds + Asset Managers as % of Open Interest  "
@@ -792,7 +818,7 @@ def write_excel(fx_rows: list[dict], fx_data: dict, cot_date, outdir: Path) -> N
         (outdir / "momentum_positioning.png").write_bytes(buf.getvalue())
         buf.seek(0)
         img = XLImage(buf)
-        img.anchor = f"A{chart_row}"
+        img.anchor = "A113"   # fixed anchor — sits clear of the history chart above
         ws.add_image(img)
         print("  Saved → momentum_positioning.png")
 
@@ -806,21 +832,23 @@ def write_table_csv(fx_rows: list[dict], cot_date, outdir: Path) -> None:
     AM-vs-lev divergence is a core part of the positioning read."""
     import csv
 
-    cols = ["CCY", "13W Pctl", "13W Z", "52W Pctl", "52W Z", "5Y Pctl", "5Y Z",
+    cols = ["CCY", "13W Pctl", "13W Z", "52W Pctl", "52W Z", "3Y Pctl", "3Y Z",
             "Hist Z", "Hist Pctl",
-            "WoW Chg", "MoM Chg", "Total Net", "LevFd Net", "AstMgr Net",
+            "WoW Chg", "WoW Lev", "WoW AstMgr", "MoM Chg", "MoM Lev", "MoM AstMgr",
+            "Total Net", "LevFd Net", "AstMgr Net",
             "Open Int", "Date"]
     path = outdir / "positioning_table.csv"
     with path.open("w", newline="") as f:
         w = csv.writer(f)
         w.writerow([f"# FX Positioning Monitor — COT as of {cot_date}. "
                     f"Net = (Leveraged Funds + Asset Managers) long − short as % of "
-                    f"Open Interest. 13W/52W/5Y Pctl & Z are vs trailing 13-week, 52-week "
-                    f"and 5-year (260-report) windows — horizons from tactical to "
-                    f"structural. Hist Z / Hist Pctl are vs FULL history (2006→) — Hist "
-                    f"Pctl is the y-axis of the history chart (90th/10th = range ends) and "
-                    f"the basis for any 'historic extreme' read. Windows can diverge "
-                    f"sharply; cite the one you mean."])
+                    f"Open Interest. 13W/52W/3Y Pctl & Z are vs trailing 13-week, 52-week "
+                    f"and 3-year (156-report) windows — horizons from tactical to "
+                    f"structural. Hist Z / Hist Pctl are vs FULL history (2006→). The "
+                    f"history chart y-axis is the rolling 3Y percentile (90th/10th = range "
+                    f"ends), showing how stretched positioning was at each point vs its "
+                    f"trailing 3 years. Hist Z / Hist Pctl are the basis for any 'historic "
+                    f"extreme' read. Windows can diverge sharply; cite the one you mean."])
         w.writerow(cols)
         for r in fx_rows:
             w.writerow([r.get(c, "") for c in cols])
@@ -831,7 +859,7 @@ def write_table_csv(fx_rows: list[dict], cot_date, outdir: Path) -> None:
 
 def print_summary(fx_rows: list[dict], cot_date) -> None:
     hdr = (f"{'CCY':8s} {'13W%':>5s} {'13WZ':>5s} {'52W%':>6s} {'52WZ':>6s} "
-           f"{'5Y%':>5s} {'5YZ':>5s} {'WoW':>7s} {'MoM':>7s} {'Net%':>7s}")
+           f"{'3Y%':>5s} {'3YZ':>5s} {'WoW':>7s} {'MoM':>7s} {'Net%':>7s}")
     print(f"\n{'='*84}")
     print(f"  FX Positioning Monitor  |  COT as of {cot_date}")
     print(f"  Net = (Lev Funds + Asset Mgr) long − short, as % of Open Interest")
@@ -845,7 +873,7 @@ def print_summary(fx_rows: list[dict], cot_date) -> None:
         print(f"  {r['CCY']:8s} "
               f"{r['13W Pctl']:5.1f} {r['13W Z']:+5.2f} "
               f"{r['52W Pctl']:6.1f} {r['52W Z']:+6.2f} "
-              f"{r['5Y Pctl']:5.1f} {r['5Y Z']:+5.2f} "
+              f"{r['3Y Pctl']:5.1f} {r['3Y Z']:+5.2f} "
               f"{r['WoW Chg']:+7.2f} {mom} "
               f"{r['Total Net']:+7.2f}{flag}")
     print(f"{'='*84}\n")
