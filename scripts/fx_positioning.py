@@ -21,7 +21,7 @@ Outputs (written to --outdir, default = current working directory):
     Positioning_Data.xlsx    formatted table + all three charts embedded
     ytd_positioning.png      standalone YTD distribution box plot
     history_positioning.png  full-history small-multiples, y-axis = rolling 3Y percentile
-    momentum_positioning.png level (52W Z) vs 1M change in 52W Z scatter, one dot per ccy
+    momentum_positioning.png holdings (52W Z level) vs flows (1M change in 52W Z) scatter, one dot per ccy
     positioning_table.csv    machine-readable table incl. Lev / AstMgr split
 
 Usage:
@@ -629,7 +629,7 @@ def _make_history_chart(fx_data: dict):
     return buf
 
 
-# ── Momentum scatter: level vs 1-month change in 52W Z-score ──────────────────
+# ── Holdings-vs-flows scatter: 52W Z level vs 1-month change in 52W Z-score ────
 
 def _z52_at(values: list[float], end_idx: int) -> float:
     """52W Z-score of the observation at position `end_idx`, computed on its own
@@ -641,10 +641,10 @@ def _z52_at(values: list[float], end_idx: int) -> float:
 
 
 def _make_momentum_scatter(fx_data: dict, lag: int = 4):
-    """Scatter of positioning *level* vs *momentum*, one dot per currency:
+    """Scatter of *holdings* vs *flows*, one dot per currency:
 
-        y = current 52W Z-score (how stretched the position is on the year)
-        x = change in that 52W Z-score over the last `lag` reports (~1 month)
+        y = holdings: current 52W Z-score (how stretched the position is on the year)
+        x = flows: change in that 52W Z-score over the last `lag` reports (~1 month)
 
     Recomputes each point's prior 52W Z on its own shifted window, so the x-axis
     is a true change in the standardized score, not a raw %OI delta. The four
@@ -657,7 +657,7 @@ def _make_momentum_scatter(fx_data: dict, lag: int = 4):
         matplotlib.use("Agg")
         import matplotlib.pyplot as plt
     except Exception as e:
-        print(f"  Momentum scatter skipped: {e}")
+        print(f"  Holdings-vs-flows scatter skipped: {e}")
         return None
 
     pts = []  # (ccy, x=ΔZ over lag, y=level Z)
@@ -671,7 +671,7 @@ def _make_momentum_scatter(fx_data: dict, lag: int = 4):
         pts.append((ccy, z_now - z_lag, z_now))
 
     if not pts:
-        print("  Momentum scatter skipped: no currency has enough history")
+        print("  Holdings-vs-flows scatter skipped: no currency has enough history")
         return None
 
     fig, ax = plt.subplots(figsize=(9, 7))
@@ -706,11 +706,11 @@ def _make_momentum_scatter(fx_data: dict, lag: int = 4):
     ax.text( xpad * 0.6, -ypad * 0.92, "SHORT, covering",  **q)
     ax.text(-xpad * 0.6, -ypad * 0.92, "SHORT & extending", **q)
 
-    ax.set_xlabel(f"1-Month Change in Z-Score (52W, vs {lag} reports ago)", fontsize=10)
-    ax.set_ylabel("Level Z-Score (52W)", fontsize=10)
+    ax.set_xlabel(f"Flows — 1M Change in 52W Z-Score (vs {lag} reports ago)", fontsize=10)
+    ax.set_ylabel("Holdings — 52W Z-Score (level)", fontsize=10)
     cot_date = max(h["date"] for v in fx_data.values() for h in [v["history"][-1]])
     ax.set_title(
-        "FX Speculative Positioning: Level vs 1M Change in Z-Score (52W)\n"
+        "FX Speculative Positioning: Holdings vs Flows (52W Z-Score)\n"
         f"CFTC TFF Combined — (Lev Funds + Asset Mgrs) Net %OI · COT {cot_date}",
         fontsize=11, fontweight="bold", color="#1F3864",
     )

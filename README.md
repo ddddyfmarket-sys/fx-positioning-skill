@@ -15,7 +15,7 @@ When invoked, it:
    percentiles and z-scores (tactical → cyclical → structural), and WoW & MoM changes.
 2. Produces a formatted Excel workbook, three charts (a YTD positioning-score
    distribution, a full-history time series on a **rolling 3-year percentile**
-   y-axis, and a supplementary level-vs-momentum scatter), and a
+   y-axis, and a supplementary holdings-vs-flows scatter), and a
    machine-readable CSV.
 3. Has the agent read the table and **view the charts**, then write a one-page
    positioning note in the house style of the JPM FX Positioning Monitor /
@@ -41,12 +41,12 @@ The charts the analysis reads (also embedded in the workbook):
 |---|---|
 | ![YTD](examples/ytd_positioning.png) | ![History](examples/history_positioning.png) |
 
-Plus a supplementary **level-vs-momentum** scatter — y = current 52W z-score
-(how stretched on the year), x = the 1-month change in that z-score (which way
-the book is moving), one dot per currency; quadrants read as long/short ×
-adding/paring:
+Plus a supplementary **holdings-vs-flows** scatter — y = holdings (current 52W
+z-score, how stretched on the year), x = flows (the 1-month change in that
+z-score, which way the book is moving), one dot per currency; quadrants read as
+long/short × adding/paring:
 
-![Momentum](examples/momentum_positioning.png)
+![Holdings vs flows](examples/momentum_positioning.png)
 
 And the written note Claude produces from them: see
 [`examples/sample_note.md`](examples/sample_note.md).
@@ -125,7 +125,7 @@ python3 "$SKILL_DIR/scripts/fx_positioning.py" --refresh  # bypass 24h cache
 | `positioning_table.csv` | The table incl. the Leveraged-Funds vs Asset-Manager split — the source of truth for every number in the note. |
 | `ytd_positioning.png` | YTD distribution of each currency's 52W positioning score, with current (×) and 1-week-ago (•) marked. |
 | `history_positioning.png` | Full-history small multiples per currency: y-axis = **rolling 3Y (trailing 156-report) percentile** of Total Net % OI (0–100), with 90th/10th range-end bands and the 50th-percentile median — how stretched each point was vs its prior 3 years. |
-| `momentum_positioning.png` | Supplementary level-vs-momentum scatter: y = current 52W z-score, x = 1-month change in that z-score, one dot per currency; quadrants = long/short × adding/paring. |
+| `momentum_positioning.png` | Supplementary holdings-vs-flows scatter: y = holdings (current 52W z-score), x = flows (1-month change in that z-score), one dot per currency; quadrants = long/short × adding/paring. |
 | `Positioning_Data.xlsx` | Formatted table + all three charts embedded. |
 | `fx_positioning_note_<date>.md` / `.pdf` | The written note and its styled one-page PDF (produced by `scripts/md_to_pdf.py`). |
 
