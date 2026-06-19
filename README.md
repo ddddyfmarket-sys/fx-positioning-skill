@@ -20,6 +20,8 @@ When invoked, it:
 3. Has the agent read the table and **view the charts**, then write a one-page
    positioning note in the house style of the JPM FX Positioning Monitor /
    Morgan Stanley G10 FX positioning reports.
+4. Renders that note into a styled, one-page **PDF** (the deliverable the PM
+   opens) via the bundled `scripts/md_to_pdf.py`.
 
 The note is **descriptive, not advisory** — it tells you where the market is
 positioned (levels, range position, cohort splits, flows), and leaves the
@@ -125,15 +127,26 @@ python3 "$SKILL_DIR/scripts/fx_positioning.py" --refresh  # bypass 24h cache
 | `history_positioning.png` | Full-history small multiples per currency: y-axis = **rolling 3Y (trailing 156-report) percentile** of Total Net % OI (0–100), with 90th/10th range-end bands and the 50th-percentile median — how stretched each point was vs its prior 3 years. |
 | `momentum_positioning.png` | Supplementary level-vs-momentum scatter: y = current 52W z-score, x = 1-month change in that z-score, one dot per currency; quadrants = long/short × adding/paring. |
 | `Positioning_Data.xlsx` | Formatted table + all three charts embedded. |
+| `fx_positioning_note_<date>.md` / `.pdf` | The written note and its styled one-page PDF (produced by `scripts/md_to_pdf.py`). |
 
 The CFTC API response is cached locally (`~/.fx_cache/`) for 24h, so repeated
 runs are fast and don't re-hit the API.
+
+To render an existing note to PDF directly:
+
+```bash
+python3 "$SKILL_DIR/scripts/md_to_pdf.py" fx_positioning_note_<date>.md
+```
+
+It converts Markdown → styled HTML → PDF, preferring headless Chrome and
+falling back to weasyprint / wkhtmltopdf.
 
 ## Repository layout
 
 ```
 SKILL.md                  the skill definition (workflow + metric interpretation)
 scripts/fx_positioning.py the CFTC pipeline
+scripts/md_to_pdf.py      renders the written note (.md) into a styled PDF
 references/writing_style.md the house writing style the analysis follows
 examples/                 a sample note + charts
 requirements.txt          Python dependencies

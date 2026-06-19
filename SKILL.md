@@ -50,7 +50,9 @@ provides this when the skill loads. Typical locations:
 - Dependencies (`requests`, `openpyxl`, `matplotlib`, `numpy`) are normally
   present. If a run fails on a missing package, install it and retry once.
 
-The script writes five files to the output directory:
+The script writes five files to the output directory (a sixth, the PDF of the
+note, is produced at the end of the workflow by `scripts/md_to_pdf.py` — see
+step 6):
 
 | File | What it is |
 |---|---|
@@ -209,6 +211,26 @@ Keep the whole thing to roughly one page. Density over length.
 Reference the charts by name so the PM knows which figure backs each read. The
 YTD and history charts are the core evidence; cite `momentum_positioning.png`
 when you make a level-vs-trajectory point (who's adding to vs paring a position).
+
+### 6. Render the note to PDF — final step
+
+Once the note `.md` is written, convert it to a styled, one-page PDF with the
+bundled converter, then **open the PDF and look at it** to confirm it rendered
+(no overflow, headings/bullets intact). This is the last action of the workflow.
+
+```bash
+python3 "<skill-dir>/scripts/md_to_pdf.py" fx_positioning_note_<COT-date>.md
+```
+
+- Run it from the user's working directory; the PDF lands next to the `.md`
+  (`fx_positioning_note_<COT-date>.pdf`). With no filename argument the converter
+  picks the newest `fx_positioning_note_*.md` in the current directory; pass
+  `-o <path>` to override the output location.
+- It renders Markdown → styled HTML → PDF, preferring headless Chrome and
+  falling back to weasyprint / wkhtmltopdf. If it reports no backend, say so
+  rather than silently skipping the PDF.
+- After it writes the file, **read the PDF** (view it) to verify the render —
+  the PDF is the deliverable the PM opens, so confirm it before finishing.
 
 ## What good looks like
 

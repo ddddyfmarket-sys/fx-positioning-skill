@@ -2,3 +2,4 @@ requests
 openpyxl
 matplotlib
 numpy
+markdown
