@@ -21,7 +21,7 @@ Outputs (written to --outdir, default = current working directory):
     Positioning_Data.xlsx    formatted table + all three charts embedded
     ytd_positioning.png      standalone YTD distribution box plot
     history_positioning.png  full-history small-multiples, y-axis = rolling 3Y percentile
-    momentum_positioning.png holdings (52W Z level) vs flows (1M change in 52W Z) scatter, one dot per ccy
+    holdings_flows_positioning.png holdings (52W Z level) vs flows (1M change in 52W Z) scatter, one dot per ccy
     positioning_table.csv    machine-readable table incl. Lev / AstMgr split
 
 Usage:
@@ -815,12 +815,12 @@ def write_excel(fx_rows: list[dict], fx_data: dict, cot_date, outdir: Path) -> N
 
     buf = _make_momentum_scatter(fx_data)
     if buf:
-        (outdir / "momentum_positioning.png").write_bytes(buf.getvalue())
+        (outdir / "holdings_flows_positioning.png").write_bytes(buf.getvalue())
         buf.seek(0)
         img = XLImage(buf)
         img.anchor = "A113"   # fixed anchor — sits clear of the history chart above
         ws.add_image(img)
-        print("  Saved → momentum_positioning.png")
+        print("  Saved → holdings_flows_positioning.png")
 
     wb.save(excel_path)
     print(f"  Saved → {excel_path.name}")

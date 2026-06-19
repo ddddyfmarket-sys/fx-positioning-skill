@@ -59,7 +59,7 @@ step 6):
 | `positioning_table.csv` | The table incl. the Leveraged-Funds vs Asset-Manager split. **Source of truth for all numbers you cite.** |
 | `ytd_positioning.png` | YTD distribution box plot: each currency's YTD range of 52W z-scores, with current (×) and 1-week-ago (•) marked. |
 | `history_positioning.png` | Full-history small multiples per currency, y-axis = **rolling 3Y (trailing 156-report) percentile** of Total Net % OI (0–100), with 90th/10th range-end bands and the 50th-percentile median. Reads as how stretched positioning was *at that point* vs its prior 3 years. |
-| `momentum_positioning.png` | **Supplementary** holdings-vs-flows scatter: y = holdings (current 52W z-score, the level), x = flows (1-month change in that 52W z-score), one dot per currency. Quadrants read as long/short × adding/paring (top-right = long & extending, bottom-right = short & covering). |
+| `holdings_flows_positioning.png` | **Supplementary** holdings-vs-flows scatter: y = holdings (current 52W z-score, the level), x = flows (1-month change in that 52W z-score), one dot per currency. Quadrants read as long/short × adding/paring (top-right = long & extending, bottom-right = short & covering). |
 | `Positioning_Data.xlsx` | Formatted table + all three charts embedded — the deliverable workbook for the PM. |
 
 ### 2. Read the writing style
@@ -91,7 +91,7 @@ read; the fourth (holdings-vs-flows scatter) is a supplement for broader regime 
    `Hist Pctl`. For a genuine multi-year *extreme* read, still cross-check
    `Hist Z` / `Hist Pctl` in the table (full sample; |Hist Z| ≳ 2 is a true
    outlier); the 90th/10th bands flag trailing-3Y range ends, a softer bar.
-4. `momentum_positioning.png` *(supplement only)* — the cross-sectional **holdings
+4. `holdings_flows_positioning.png` *(supplement only)* — the cross-sectional **holdings
    vs flows** snapshot: y = holdings (current 52W z-score, how stretched on the year),
    x = flows (the 1-month change in that same 52W z-score — which way, and how fast,
    the book is moving). The four quadrants are long/short (above/below 0) ×
@@ -203,13 +203,13 @@ Close the file with a source line:
 
 ```markdown
 ---
-*Source: CFTC TFF Combined. Charts: ytd_positioning.png, history_positioning.png, momentum_positioning.png.*
+*Source: CFTC TFF Combined. Charts: ytd_positioning.png, history_positioning.png, holdings_flows_positioning.png.*
 ```
 
 Keep the whole thing to roughly one page. Density over length.
 
 Reference the charts by name so the PM knows which figure backs each read. The
-YTD and history charts are the core evidence; cite `momentum_positioning.png`
+YTD and history charts are the core evidence; cite `holdings_flows_positioning.png`
 when you make a holdings-vs-flows point (who's adding to vs paring a position).
 
 ### 6. Render the note to PDF — final step

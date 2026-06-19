@@ -5,16 +5,16 @@
 
 ## Key Takeaways
 
-- **USD is neutral in aggregate but elevated on the year, and the cohorts disagree.** DXY net +5.84% OI sits 76.9th %ile / +1.0z on 52W, yet leveraged funds are net short USD (−27.15) while asset managers are net long (+32.99). Pared WoW −2.98, MoM −5.19 (`momentum_positioning.png`).
+- **USD is neutral in aggregate but elevated on the year, and the cohorts disagree.** DXY net +5.84% OI sits 76.9th %ile / +1.0z on 52W, yet leveraged funds are net short USD (−27.15) while asset managers are net long (+32.99). Pared WoW −2.98, MoM −5.19 (`holdings_flows_positioning.png`).
 - **The week was a broad reduction.** Only NZD (WoW +3.22) and MXN (+0.63) were added to; everything else was cut. On the month the heaviest paring was CAD (−27.19% OI) and AUD (−25.72), against NZD's +30.69 build.
 - **EUR and JPY sit at the short end of their year — same percentile, different position.** Both 1.9th %ile / ~−2z on 52W. EUR's net is still +25.49 (asset managers hold +30.34, lev near flat at −4.85) — a pared long at its yearly floor; JPY is a genuine short at −34.71 (Hist 13.2th %ile, −1.08z), both cohorts short.
 - **CHF presses the top of its 1-year range — 90.4th %ile, +1.05z on 52W — but is still net short −38.91% OI** and only mid-range structurally (3Y 44.2th, Hist 13.1th / −1.09z): shorts covered to a 1-yr high, not a long. Added to this week (WoW −4.62 net).
-- **AUD is the level-vs-flow standout: a structurally large long being cut fast.** 3Y 87.8th %ile / +1.34z, yet 13W 7.7th / −2.73z and the biggest weekly reduction (WoW −10.4% OI, MoM −25.72) — top-left on `momentum_positioning.png` (long, paring).
+- **AUD is the level-vs-flow standout: a structurally large long being cut fast.** 3Y 87.8th %ile / +1.34z, yet 13W 7.7th / −2.73z and the biggest weekly reduction (WoW −10.4% OI, MoM −25.72) — top-left on `holdings_flows_positioning.png` (long, paring).
 - **NZD saw the biggest monthly build and is covered to the top of its 3-month range** (13W 100th %ile / +2.07z, MoM +30.69), but the net is still short −36.26% OI.
 
 ## Aggregate / USD
 
-The dollar reads neutral-to-modestly-long in aggregate — DXY +5.84% OI — but that masks both a high yearly percentile (52W 76.9th / +1.0z) and a clean cohort split: leveraged funds net short USD (−27.15), asset managers net long (+32.99). On the structural windows the dollar is unremarkable (3Y 43.6th / −0.2z, Hist 48th). Flow ran one way this week: of the eleven markets, nine were pared on both WoW and MoM. `momentum_positioning.png` shows the board clustered left of zero — almost everyone is paring — with only NZD and CHF in add-and-extend territory.
+The dollar reads neutral-to-modestly-long in aggregate — DXY +5.84% OI — but that masks both a high yearly percentile (52W 76.9th / +1.0z) and a clean cohort split: leveraged funds net short USD (−27.15), asset managers net long (+32.99). On the structural windows the dollar is unremarkable (3Y 43.6th / −0.2z, Hist 48th). Flow ran one way this week: of the eleven markets, nine were pared on both WoW and MoM. `holdings_flows_positioning.png` shows the board clustered left of zero — almost everyone is paring — with only NZD and CHF in add-and-extend territory.
 
 ## G10 divergences
 
@@ -35,4 +35,4 @@ The G10 board is short the European pair complex and covering the commodity bloc
 - **Level vs flow:** AUD — structurally long, paring fast (top-left); NZD & CHF — covering/extending (right side).
 
 ---
-*Source: CFTC TFF Combined. Charts: ytd_positioning.png, history_positioning.png, momentum_positioning.png.*
+*Source: CFTC TFF Combined. Charts: ytd_positioning.png, history_positioning.png, holdings_flows_positioning.png.*
